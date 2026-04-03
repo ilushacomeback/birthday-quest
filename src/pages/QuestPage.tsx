@@ -71,17 +71,15 @@ export function QuestPage() {
       .replace(/[.,!?;:;"'`()-]/g, '')
       .replace(/\s+/g, ' ');
 
-  const handleStart = async () => {
+  const handleStart = () => {
     onQuestStarted();
-    // await audioManager.unlock();
-    await audioManager.play('electro');
+    audioManager.play('electro');
     onStepChanged(INITIAL_STEP_ID);
   };
 
-  const handleReplay = async () => {
+  const handleReplay = () => {
     onReplayStarted();
-    // await audioManager.unlock();
-    await audioManager.play('electro');
+    audioManager.play('electro');
     onQuestStarted();
     onStepChanged(INITIAL_STEP_ID);
   };
@@ -91,7 +89,7 @@ export function QuestPage() {
     onTogglePathToPhotosFromStartPage(true);
   };
 
-  const handleDefaultButtonClick = async (button: {
+  const handleDefaultButtonClick = (button: {
     label: string;
     sound?: string;
     nextStepId: QuestStepId;
@@ -102,11 +100,11 @@ export function QuestPage() {
       // await audioManager.unlock();
     }
 
-    await audioManager.play(button.sound ?? 'click');
+    audioManager.play(button.sound ?? 'click');
     onStepChanged(button.nextStepId);
   };
 
-  const handleAnswerSubmit = async () => {
+  const handleAnswerSubmit = () => {
     if (currentStep.type !== 'answer') return;
 
     const normalized = normalizeAnswer(currentAnswer);
@@ -116,11 +114,11 @@ export function QuestPage() {
       .includes(normalized);
 
     if (!ok) {
-      await audioManager.play(currentStep.errorSound ?? 'error');
+      audioManager.play(currentStep.errorSound ?? 'error');
       return;
     }
 
-    await audioManager.play(currentStep.successSound ?? 'success');
+    audioManager.play(currentStep.successSound ?? 'success');
     onAnswerSubmitted();
   };
 

@@ -14,7 +14,7 @@ class AudioManager {
     items.forEach((item) => this.register(item.name, item.src));
   }
 
-  async play(name?: string) {
+  play(name?: string) {
     if (!name) return;
 
     const sound = this.sounds.get(name);
@@ -22,9 +22,9 @@ class AudioManager {
 
     try {
       sound.currentTime = 0;
-      console.log('start play')
-      await sound.play();
-      console.log('finish play')
+      console.log('start play');
+      sound.play();
+      console.log('finish play');
     } catch (e) {
       console.log('play error', e);
       //
