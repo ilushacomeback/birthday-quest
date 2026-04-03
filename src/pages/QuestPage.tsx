@@ -1,17 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react'; // убрал useState
 import { useUnit } from 'effector-react';
-import { audioManager } from '../model/audio';
-import { StepTransition } from '../shared/ui/StepTransition';
-import { DefaultStepCard } from '../features/quest/ui/DefaultStepCard';
-import { AnswerStepCard } from '../features/quest/ui/AnswerStepCard';
-import { CarouselStepCard } from '../features/quest/ui/CarouselStepCard';
-import { StartScreen } from '../features/quest/ui/StartScreen';
-import { CompletedScreen } from '../features/quest/ui/CompletedScreen';
-import { ScreenCard } from '../shared/ui/ScreenCard';
-import type { QuestStepId } from '../features/quest/config/types';
-import { INITIAL_STEP_ID } from '../features/quest/config/constants';
-import { Loader } from '../shared/ui/Loader';
-import { BackButton } from '../features/quest/ui/BackButton';
+import { StepTransition } from '../shared/StepTransition';
+import { DefaultStepCard } from '../features/ui/DefaultStepCard';
+import { AnswerStepCard } from '../features/ui/AnswerStepCard';
+import { CarouselStepCard } from '../features/ui/CarouselStepCard';
+import { StartScreen } from '../features/ui/StartScreen';
+import { CompletedScreen } from '../features/ui/CompletedScreen';
+import { ScreenCard } from '../shared/ScreenCard';
+import type { QuestStepId } from '../features/config/types';
+import { INITIAL_STEP_ID } from '../features/config/constants';
+import { Loader } from '../shared/Loader';
+import { BackButton } from '../features/ui/BackButton';
 import {
   $completedOnce,
   $currentAnswer,
@@ -27,11 +26,7 @@ import {
   stepChanged,
   togglePathToPhotosFromStartPage,
 } from '../model/quest';
-import click from '../assets/sounds/click.mp3';
-import electro from '../assets/sounds/electro.mp3';
-import engine from '../assets/sounds/engine.mp3';
-import error from '../assets/sounds/error.mp3';
-import success from '../assets/sounds/success.mp3';
+import { useQuestAudio } from '../hooks/useQuestAudio'; // импортируем хук
 
 export function QuestPage() {
   const currentStep = useUnit($currentStep);
@@ -51,32 +46,8 @@ export function QuestPage() {
     togglePathToPhotosFromStartPage,
   );
 
-  const [isAudioReady, setIsAudioReady] = useState(false);
-
-  useEffect(() => {
-    let mounted = true;
-
-    void audioManager
-      .registerMany([
-        { name: 'click', src: click },
-        { name: 'success', src: success },
-        { name: 'error', src: error },
-        { name: 'engine', src: engine },
-        { name: 'electro', src: electro },
-      ])
-      .then(() => {
-        if (mounted) {
-          setIsAudioReady(true);
-        }
-      })
-      .catch((e) => {
-        console.log('audio preload error', e);
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  // Используем аудио хук
+  const { play } = useQuestAudio();
 
   useEffect(() => {
     onAppStarted();
@@ -90,24 +61,21 @@ export function QuestPage() {
       .replace(/[.,!?;:;"'`()-]/g, '')
       .replace(/\s+/g, ' ');
 
-  const handleStart = async () => {
-    await audioManager.init();
-    audioManager.play('electro');
+  const handleStart = () => {
+    play('electro'); // Мгновенно, без await и init
     onQuestStarted();
     onStepChanged(INITIAL_STEP_ID);
   };
 
-  const handleReplay = async () => {
-    await audioManager.init();
-    audioManager.play('electro');
+  const handleReplay = () => {
+    play('electro');
     onReplayStarted();
     onQuestStarted();
     onStepChanged(INITIAL_STEP_ID);
   };
 
-  const handleGoToPhotos = async () => {
-    await audioManager.init();
-    audioManager.play('electro');
+  const handleGoToPhotos = () => {
+    play('electro');
     onStepChanged('memories');
     onTogglePathToPhotosFromStartPage(true);
   };
@@ -118,11 +86,24 @@ export function QuestPage() {
     nextStepId: QuestStepId;
   }) => {
     console.log('change step', button);
+
     if (currentStep.id === INITIAL_STEP_ID) {
       onQuestStarted();
     }
 
-    audioManager.play(button.sound ?? 'click');
+    const soundName = button.sound ?? 'click';
+    if (
+      soundName === 'click' ||
+      soundName === 'success' ||
+      soundName === 'error' ||
+      soundName === 'engine' ||
+      soundName === 'electro'
+    ) {
+      play(soundName);
+    } else {
+      play('click')
+    }
+
     onStepChanged(button.nextStepId);
   };
 
@@ -130,21 +111,26 @@ export function QuestPage() {
     if (currentStep.type !== 'answer') return;
 
     const normalized = normalizeAnswer(currentAnswer);
-
     const ok = currentStep.acceptedAnswers
       .map(normalizeAnswer)
       .includes(normalized);
 
     if (!ok) {
-      audioManager.play(currentStep.errorSound ?? 'error');
+      const errorSound = currentStep.errorSound ?? 'error';
+      if (errorSound === 'error') {
+        play('error');
+      }
       return;
     }
 
-    audioManager.play(currentStep.successSound ?? 'success');
+    const successSound = currentStep.successSound ?? 'success';
+    if (successSound === 'success') {
+      play('success');
+    }
     onAnswerSubmitted();
   };
 
-  if (!init || !isAudioReady) return <Loader />;
+  if (!init) return <Loader />;
 
   console.log('currentstate', currentStep);
 
@@ -172,6 +158,7 @@ export function QuestPage() {
                 onSecret={() => onStepChanged('secret')}
               />
             )}
+
             {started && currentStep.type === 'default' && (
               <DefaultStepCard
                 lines={currentStep.lines}

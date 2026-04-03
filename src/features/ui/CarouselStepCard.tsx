@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { ScreenCard } from '../../../shared/ui/ScreenCard';
-import { QuestButton } from '../../../shared/ui/QuestButton';
+import { ScreenCard } from '../../shared/ScreenCard';
+import { QuestButton } from '../../shared/QuestButton';
 import { useUnit } from 'effector-react';
-import { $pathToPhotosFromStartPage } from '../../../model/quest';
+import { $pathToPhotosFromStartPage } from '../../model/quest';
 import type { TQuestButton } from '../config/types';
 import { BackButton } from './BackButton';
 

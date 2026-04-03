@@ -1,22 +1,22 @@
 import type { QuestStep, QuestStepId } from './types';
-import bear from '../../../assets/images/bear.jpg';
-import call from '../../../assets/images/call.jpg';
-import fuck from '../../../assets/images/fuck.jpg';
-import legenda from '../../../assets/images/legenda.jpg';
-import pasha from '../../../assets/images/pasha.jpg';
-import see from '../../../assets/images/see.jpg';
-import sextop from '../../../assets/images/sextop.jpg';
-import sexy from '../../../assets/images/sexy.jpg';
-import sexy2 from '../../../assets/images/sexy2.jpg';
-import sexy3 from '../../../assets/images/sexy3.jpg';
-import sleep1 from '../../../assets/images/sleep1.jpg';
-import sleep2 from '../../../assets/images/sleep2.jpg';
-import sleep3 from '../../../assets/images/sleep3.jpg';
-import tg from '../../../assets/images/tg.jpg';
-import together from '../../../assets/images/together.jpg';
-import toilet from '../../../assets/images/toilet.jpg';
-import train from '../../../assets/images/train.jpg';
-import zoya from '../../../assets/images/zoya.jpg';
+import bear from '../../assets/images/bear.jpg'
+import call from '../../assets/images/call.jpg';
+import fuck from '../../assets/images/fuck.jpg';
+import legenda from '../../assets/images/legenda.jpg';
+import pasha from '../../assets/images/pasha.jpg';
+import see from '../../assets/images/see.jpg';
+import sextop from '../../assets/images/sextop.jpg';
+import sexy from '../../assets/images/sexy.jpg';
+import sexy2 from '../../assets/images/sexy2.jpg';
+import sexy3 from '../../assets/images/sexy3.jpg';
+import sleep1 from '../../assets/images/sleep1.jpg';
+import sleep2 from '../../assets/images/sleep2.jpg';
+import sleep3 from '../../assets/images/sleep3.jpg';
+import tg from '../../assets/images/tg.jpg';
+import together from '../../assets/images/together.jpg';
+import toilet from '../../assets/images/toilet.jpg';
+import train from '../../assets/images/train.jpg';
+import zoya from '../../assets/images/zoya.jpg';
 import { INITIAL_STEP_ID } from './constants';
 
 export const questStepsMap: Record<QuestStepId, QuestStep> = {
@@ -243,6 +243,6 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
 
   completed: {
     id: 'completed',
-    type: 'completed'
-  }
+    type: 'completed',
+  },
 };

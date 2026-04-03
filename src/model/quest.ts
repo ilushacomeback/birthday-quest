@@ -1,7 +1,7 @@
 import { createEvent, createStore, sample } from 'effector';
-import { questStepsMap } from '../features/quest/config/steps';
-import type { QuestStepId } from '../features/quest/config/types';
-import { INITIAL_STEP_ID, STORAGE_KEY } from '../features/quest/config/constants';
+import { questStepsMap } from '../features/config/steps';
+import type { QuestStepId } from '../features/config/types';
+import { INITIAL_STEP_ID, STORAGE_KEY } from '../features/config/constants';
 
 
 

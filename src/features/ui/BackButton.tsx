@@ -1,4 +1,4 @@
-import { QuestButton } from '../../../shared/ui/QuestButton';
+import { QuestButton } from '../../shared/QuestButton';
 import type { TQuestButton } from '../config/types';
 
 export const BackButton = ({

@@ -1,10 +1,10 @@
-import { QuestButton } from '../../../shared/ui/QuestButton';
-import { ScreenCard } from '../../../shared/ui/ScreenCard';
+import { QuestButton } from '../../shared/QuestButton';
+import { ScreenCard } from '../../shared/ScreenCard';
 import type { QuestStepId } from '../config/types';
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { DefaultLines } from '../../../shared/ui/lines/DefaultLines';
-import { LoadingLines } from '../../../shared/ui/lines/LoadingLines';
+import { DefaultLines } from '../../shared/lines/DefaultLines';
+import { LoadingLines } from '../../shared/lines/LoadingLines';
 
 type QuestButtonModel = {
   label: string;

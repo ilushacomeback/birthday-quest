@@ -1,5 +1,5 @@
-import { ScreenCard } from '../../../shared/ui/ScreenCard';
-import { QuestButton } from '../../../shared/ui/QuestButton';
+import { ScreenCard } from '../../shared/ScreenCard';
+import { QuestButton } from '../../shared/QuestButton';
 
 type StartScreenProps = {
   onStart: () => void;

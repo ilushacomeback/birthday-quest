@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, type SubmitEvent } from 'react';
 import { HiOutlineLightBulb } from 'react-icons/hi';
 import { AnimatePresence, motion } from 'motion/react';
-import { QuestButton } from '../../../shared/ui/QuestButton';
-import { ScreenCard } from '../../../shared/ui/ScreenCard';
-import { DefaultLines } from '../../../shared/ui/lines/DefaultLines';
+import { QuestButton } from '../../shared/QuestButton';
+import { ScreenCard } from '../../shared/ScreenCard';
+import { DefaultLines } from '../../shared/lines/DefaultLines';
 
 type AnswerStepCardProps = {
   lines: string[];
