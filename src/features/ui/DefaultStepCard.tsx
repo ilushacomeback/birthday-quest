@@ -1,22 +1,16 @@
 import { QuestButton } from '../../shared/QuestButton';
 import { ScreenCard } from '../../shared/ScreenCard';
-import type { QuestStepId } from '../config/types';
+import type { TQuestButton } from '../config/types';
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { DefaultLines } from '../../shared/lines/DefaultLines';
 import { LoadingLines } from '../../shared/lines/LoadingLines';
 
-type QuestButtonModel = {
-  label: string;
-  sound?: string;
-  nextStepId: QuestStepId;
-};
-
 type DefaultStepCardProps = {
   lines: string[];
   loadingLines?: string[];
-  buttons: QuestButtonModel[];
-  onButtonClick: (button: QuestButtonModel) => void;
+  buttons: TQuestButton[];
+  onButtonClick: (button: TQuestButton) => void;
 };
 
 export function DefaultStepCard({

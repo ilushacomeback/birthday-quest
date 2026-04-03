@@ -104,7 +104,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
     ],
     buttons: [
       {
-        label: 'Что-то не заводится',
+        label: 'Завести',
         nextStepId: 'debt-question',
         sound: 'failedEngine',
       },
@@ -115,7 +115,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
     id: 'debt-question',
     type: 'answer',
     lines: [
-      'Ох, и вправду... Наверное бензина нет.',
+      'Ох, что-то не заводится... Наверное бензина нет.',
       'Надо заправиться, но где же взять деньги?',
       'Точно, а помнишь одного друга, который несколько лет не мог вернуть небольшой долг?',
       'Напомни-ка, сколько рублей он был тебе должен?',

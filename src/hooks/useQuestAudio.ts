@@ -6,8 +6,8 @@ import error from '../assets/sounds/error.mp3';
 import engine from '../assets/sounds/engine.mp3';
 import electro from '../assets/sounds/electro.mp3';
 import failedEngine from '../assets/sounds/failed-engine.mp3';
+import type { SoundName } from '../features/config/types';
 
-type SoundName = 'click' | 'success' | 'error' | 'engine' | 'electro' | 'failedEngine';
 
 class AudioPreloader {
   private sounds: Map<SoundName, HTMLAudioElement[]> = new Map();
@@ -126,7 +126,8 @@ export const useQuestAudio = () => {
     audioPreloader.preloadAll().then(() => {
       setReady(true);
     });
-  }, []);
+    
+  }, [ready]);
 
   const play = (name: SoundName) => {
     if (!ready) {

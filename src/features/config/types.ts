@@ -1,6 +1,8 @@
 import type { INITIAL_STEP_ID } from "./constants";
 
 
+export type SoundName = 'click' | 'success' | 'error' | 'engine' | 'electro' | 'failedEngine';
+
 export type QuestStepId =
   | typeof INITIAL_STEP_ID
   | 'beer-question'
@@ -18,7 +20,7 @@ export type QuestStepId =
 
 export type TQuestButton = {
   label: string;
-  sound?: string;
+  sound?: SoundName;
   nextStepId: QuestStepId;
 };
 

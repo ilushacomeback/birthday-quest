@@ -12,6 +12,7 @@ export const BackButton = ({
         onButtonClick({
           label: 'Вернуться',
           nextStepId: 'completed',
+          sound: 'click'
         })
       }
     >

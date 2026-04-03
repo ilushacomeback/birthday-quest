@@ -7,7 +7,7 @@ import { CarouselStepCard } from '../features/ui/CarouselStepCard';
 import { StartScreen } from '../features/ui/StartScreen';
 import { CompletedScreen } from '../features/ui/CompletedScreen';
 import { ScreenCard } from '../shared/ScreenCard';
-import type { QuestStepId } from '../features/config/types';
+import type { TQuestButton } from '../features/config/types';
 import { INITIAL_STEP_ID } from '../features/config/constants';
 import { Loader } from '../shared/Loader';
 import { BackButton } from '../features/ui/BackButton';
@@ -61,7 +61,7 @@ export function QuestPage() {
       .replace(/\s+/g, ' ');
 
   const handleStart = () => {
-    play('electro'); // Мгновенно, без await и init
+    play('electro');
     onQuestStarted();
     onStepChanged(INITIAL_STEP_ID);
   };
@@ -74,16 +74,12 @@ export function QuestPage() {
   };
 
   const handleGoToPhotos = () => {
-    play('electro');
+    play('click');
     onStepChanged('memories');
     onTogglePathToPhotosFromStartPage(true);
   };
 
-  const handleDefaultButtonClick = (button: {
-    label: string;
-    sound?: string;
-    nextStepId: QuestStepId;
-  }) => {
+  const handleDefaultButtonClick = (button: TQuestButton) => {
     console.log('change step', button);
 
     if (currentStep.id === INITIAL_STEP_ID) {
@@ -91,17 +87,7 @@ export function QuestPage() {
     }
 
     const soundName = button.sound ?? 'click';
-    if (
-      soundName === 'click' ||
-      soundName === 'success' ||
-      soundName === 'error' ||
-      soundName === 'engine' ||
-      soundName === 'electro'
-    ) {
-      play(soundName);
-    } else {
-      play('click');
-    }
+    play(soundName);
 
     onStepChanged(button.nextStepId);
   };
