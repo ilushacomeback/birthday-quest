@@ -38,7 +38,7 @@ export const TypewriterLines = ({
   mode = 'append',
   showCursor = true,
   onSound,
-  typeSoundIntervalMs = 40,
+  typeSoundIntervalMs = 65,
   getLineColorClassName,
   getCursorColorClassName,
 }: TypewriterLinesProps) => {
