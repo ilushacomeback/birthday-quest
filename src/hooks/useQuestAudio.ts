@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import click from '../assets/sounds/click.mp3';
 import success from '../assets/sounds/success.mp3';
@@ -8,7 +7,6 @@ import electro from '../assets/sounds/electro.mp3';
 import failedEngine from '../assets/sounds/failed-engine.mp3';
 import typewriter from '../assets/sounds/typewriter.mp3';
 import type { SoundName } from '../features/config/types';
-
 
 class AudioPreloader {
   private sounds: Map<SoundName, HTMLAudioElement[]> = new Map();
@@ -59,8 +57,7 @@ class AudioPreloader {
     console.log('[Audio] Все звуки предзагружены');
   }
 
-
-  play(name: SoundName, volume = 0.8) {
+  play(name: SoundName) {
     const pool = this.sounds.get(name);
     if (!pool) {
       console.warn(`[Audio] Звук ${name} не найден`);
@@ -75,7 +72,7 @@ class AudioPreloader {
       audio.currentTime = 0;
     }
 
-    audio.volume = volume;
+    audio.volume = name === 'typewriter' ? 0.5 : 0.9;
     audio.currentTime = 0;
 
     const playPromise = audio.play();
@@ -102,7 +99,6 @@ export const useQuestAudio = () => {
     audioPreloader.preloadAll().then(() => {
       setReady(true);
     });
-
   }, [ready]);
 
   const play = (name: SoundName) => {
