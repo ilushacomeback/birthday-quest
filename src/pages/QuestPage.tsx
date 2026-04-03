@@ -120,7 +120,7 @@ export function QuestPage() {
       return;
     }
 
-    onStepChanged(button.nextStepId);
+    window.setTimeout(() => onStepChanged(button.nextStepId), 100);
   };
 
   const handleAnswerSubmit = () => {
