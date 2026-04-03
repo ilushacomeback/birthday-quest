@@ -1,6 +1,5 @@
 class AudioManager {
   private sounds = new Map<string, HTMLAudioElement>();
-  private unlocked = false;
 
   register(name: string, src: string) {
     if (this.sounds.has(name)) return;
@@ -14,25 +13,6 @@ class AudioManager {
   registerMany(items: Array<{ name: string; src: string }>) {
     items.forEach((item) => this.register(item.name, item.src));
   }
-
-  // async unlock() {
-  //   if (this.unlocked) return;
-
-  //   try {
-  //     const audio = new Audio();
-  //     audio.volume = 0;
-  //     console.log('start unlock');
-  //     await audio.play().catch((e) => {
-  //       console.log('unlock play error', e);
-  //     });
-  //     console.log('finish unlock');
-  //   } catch (e) {
-  //     console.log('unlock error', e);
-  //     //
-  //   }
-
-  //   this.unlocked = true;
-  // }
 
   async play(name?: string) {
     if (!name) return;
