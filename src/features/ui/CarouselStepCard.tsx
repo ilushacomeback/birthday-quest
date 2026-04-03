@@ -5,19 +5,17 @@ import { ScreenCard } from '../../shared/ScreenCard';
 import { QuestButton } from '../../shared/QuestButton';
 import { useUnit } from 'effector-react';
 import { $pathToPhotosFromStartPage } from '../../model/quest';
-import type { TQuestButton } from '../config/types';
+import type { CarouselStep, TQuestButton } from '../config/types';
 import { BackButton } from './BackButton';
 
 type CarouselStepCardProps = {
-  images: string[];
-  captions?: string[];
+  images: CarouselStep['images'];
   buttons: TQuestButton[];
   onButtonClick: (button: TQuestButton) => void;
 };
 
 export const CarouselStepCard = ({
   images,
-  captions = [],
   buttons,
   onButtonClick,
 }: CarouselStepCardProps) => {
@@ -75,7 +73,7 @@ export const CarouselStepCard = ({
       <div className="space-y-4">
         <div className="overflow-hidden rounded-[24px]" ref={emblaRef}>
           <div className="flex">
-            {images.map((src, index) => (
+            {images.map(({ src, description }, index) => (
               <div key={src} className="min-w-0 shrink-0 grow-0 basis-full">
                 <div className="overflow-hidden rounded-[24px] border border-white/10 bg-white/5">
                   <img
@@ -84,12 +82,11 @@ export const CarouselStepCard = ({
                     className="h-[360px] w-full object-cover"
                   />
                 </div>
-
-                {captions[index] ? (
+                {description && (
                   <p className="px-1 pt-3 text-center text-sm leading-6 text-zinc-300">
-                    {captions[index]}
+                    {description}
                   </p>
-                ) : null}
+                )}
               </div>
             ))}
           </div>

@@ -72,7 +72,7 @@ class AudioPreloader {
       audio.currentTime = 0;
     }
 
-    audio.volume = name === 'typewriter' ? 0.5 : 0.9;
+    audio.volume = name === 'typewriter' ? 0.4 : 0.9;
     audio.currentTime = 0;
 
     const playPromise = audio.play();

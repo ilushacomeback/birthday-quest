@@ -43,13 +43,13 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
         label: 'Нет',
         nextStepId: INITIAL_STEP_ID,
         sound: 'error',
-        variant: 'error'
+        variant: 'error',
       },
       {
         label: 'Да',
         nextStepId: 'beer-question',
         sound: 'click',
-        variant: 'default'
+        variant: 'default',
       },
     ],
   },
@@ -83,7 +83,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
         label: 'А может ещё по одной?',
         nextStepId: 'car-question',
         sound: 'click',
-        variant: 'default'
+        variant: 'default',
       },
     ],
   },
@@ -115,7 +115,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
         label: 'Завести',
         nextStepId: 'debt-question',
         sound: 'failedEngine',
-        variant: 'default'
+        variant: 'default',
       },
     ],
   },
@@ -148,7 +148,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
         label: 'Заправиться',
         nextStepId: 'engine-start',
         sound: 'engine',
-        variant: 'default'
+        variant: 'default',
       },
     ],
   },
@@ -166,7 +166,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
         label: 'Газ',
         sound: 'click',
         nextStepId: 'memories',
-        variant: 'default'
+        variant: 'default',
       },
     ],
   },
@@ -175,36 +175,86 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
     id: 'memories',
     type: 'carousel',
     images: [
-      bear,
-      call,
-      fuck,
-      legenda,
-      pasha,
-      see,
-      sextop,
-      sexy,
-      sexy2,
-      sexy3,
-      sleep1,
-      sleep2,
-      sleep3,
-      tg,
-      together,
-      toilet,
-      train,
-      zoya,
+      {
+        src: see,
+        description: 'Указывает путь к "светлому прошлому"',
+      },
+      {
+        src: bear,
+        description: 'Вот и то самое "светлое прошлое"',
+      },
+      {
+        src: call,
+        description: 'Не геи *Алина просто что ты обрезалась((',
+      },
+      {
+        src: fuck,
+        description: 'По приколу вставил',
+      },
+      {
+        src: legenda,
+        description: 'Тут Дима голый кст',
+      },
+      {
+        src: pasha,
+        description: 'По девочкам ходили наверное',
+      },
+      {
+        src: sextop,
+        description: 'Илья попал в эскорт к Диме',
+      },
+      {
+        src: sexy,
+        description: 'Красуемся',
+      },
+      {
+        src: sexy2,
+        description: 'Дима заигрывает',
+      },
+      {
+        src: sexy3,
+        description: 'Стоим на панели у трёхи',
+      },
+      {
+        src: sleep1,
+        description: 'Спим у Ильи',
+      },
+      {
+        src: sleep2,
+        description: 'Дима в опасности',
+      },
+      {
+        src: sleep3,
+        description: 'Любим поспать',
+      },
+      {
+        src: tg,
+        description: 'Всем сердечко',
+      },
+      {
+        src: together,
+        description: 'Их было четверо, четыре пацана',
+      },
+      {
+        src: toilet,
+        description: 'Покакали',
+      },
+      {
+        src: train,
+        description: 'Дима спиздил Илью в Курск',
+      },
+      {
+        src: zoya,
+        description: 'Стоим с Зойкой',
+      },
     ],
-    captions: [
-      'Вот он, ключ к "светлому прошлому"',
-      'На созвоне',
-      'Светлое прошлое во всей красе',
-    ],
+    captions: ['Светлое прошлое во всей красе'],
     buttons: [
       {
         label: 'Дальше',
         nextStepId: 'carpet-question',
         sound: 'click',
-        variant: 'default'
+        variant: 'default',
       },
     ],
   },
@@ -240,7 +290,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
         label: 'Завершить сканирование',
         sound: 'click',
         nextStepId: 'completed',
-        variant: 'default'
+        variant: 'default',
       },
     ],
   },

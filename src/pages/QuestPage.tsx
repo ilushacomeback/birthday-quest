@@ -210,7 +210,6 @@ export function QuestPage() {
             {started && currentStep.type === 'carousel' && (
               <CarouselStepCard
                 images={currentStep.images}
-                captions={currentStep.captions}
                 buttons={currentStep.buttons}
                 onButtonClick={handleDefaultButtonClick}
               />

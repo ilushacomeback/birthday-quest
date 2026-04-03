@@ -54,10 +54,15 @@ export type AnswerStep = BaseStep & {
   nextStepId: QuestStepId;
 };
 
+type Image = {
+  src: string;
+  description?: string
+}
+
 export type CarouselStep = {
   id: 'memories';
   type: 'carousel';
-  images: string[];
+  images: Image[];
   captions: string[];
   buttons: TQuestButton[];
 };
