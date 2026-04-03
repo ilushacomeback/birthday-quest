@@ -46,8 +46,7 @@ export function QuestPage() {
     togglePathToPhotosFromStartPage,
   );
 
-  // Используем аудио хук
-  const { play } = useQuestAudio();
+  const { play, ready } = useQuestAudio();
 
   useEffect(() => {
     onAppStarted();
@@ -101,7 +100,7 @@ export function QuestPage() {
     ) {
       play(soundName);
     } else {
-      play('click')
+      play('click');
     }
 
     onStepChanged(button.nextStepId);
@@ -130,7 +129,7 @@ export function QuestPage() {
     onAnswerSubmitted();
   };
 
-  if (!init) return <Loader />;
+  if (!init || !ready) return <Loader />;
 
   console.log('currentstate', currentStep);
 

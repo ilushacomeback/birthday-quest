@@ -1,59 +1,140 @@
+
+import { useEffect, useState } from 'react';
 import click from '../assets/sounds/click.mp3';
 import success from '../assets/sounds/success.mp3';
 import error from '../assets/sounds/error.mp3';
 import engine from '../assets/sounds/engine.mp3';
 import electro from '../assets/sounds/electro.mp3';
+import failedEngine from '../assets/sounds/failed-engine.mp3';
 
-type SoundName = 'click' | 'success' | 'error' | 'engine' | 'electro';
+type SoundName = 'click' | 'success' | 'error' | 'engine' | 'electro' | 'failedEngine';
 
-class AudioPool {
+class AudioPreloader {
   private sounds: Map<SoundName, HTMLAudioElement[]> = new Map();
-  private currentIndex: Map<SoundName, number> = new Map();
-  private poolSize = 3; // 3 копии каждого звука для возможности наложения
+  private ready = false;
+  private poolSize = 2;
 
-  register(name: SoundName, src: string) {
-    const pool: HTMLAudioElement[] = [];
-    for (let i = 0; i < this.poolSize; i++) {
-      const audio = new Audio(src);
-      audio.preload = 'auto';
-      pool.push(audio);
+  async preloadAll() {
+    const items: { name: SoundName; src: string }[] = [
+      { name: 'click', src: click },
+      { name: 'success', src: success },
+      { name: 'error', src: error },
+      { name: 'engine', src: engine },
+      { name: 'electro', src: electro },
+      { name: 'failedEngine', src: failedEngine },
+    ];
+
+    const loadPromises: Promise<void>[] = [];
+
+    for (const { name, src } of items) {
+      const pool: HTMLAudioElement[] = [];
+
+      for (let i = 0; i < this.poolSize; i++) {
+        const audio = new Audio(src);
+        audio.preload = 'auto';
+        audio.volume = 0.8;
+
+        // Ждём загрузки каждого аудио
+        const loadPromise = new Promise<void>((resolve) => {
+          if (audio.readyState >= 2) {
+            resolve();
+          } else {
+            audio.addEventListener('canplaythrough', () => resolve(), {
+              once: true,
+            });
+            audio.load(); // Принудительно начинаем загрузку
+          }
+        });
+
+        loadPromises.push(loadPromise);
+        pool.push(audio);
+      }
+
+      this.sounds.set(name, pool);
     }
-    this.sounds.set(name, pool);
-    this.currentIndex.set(name, 0);
+
+    // Ждём загрузки ВСЕХ звуков
+    await Promise.all(loadPromises);
+    this.ready = true;
+    console.log('[Audio] Все звуки предзагружены');
+
+    // Прогреваем звуки (воспроизводим на долю секунды с громкостью 0)
+    this.warmup();
+  }
+
+  private warmup() {
+    this.sounds.forEach((pool, name) => {
+      pool.forEach((audio) => {
+        const originalVolume = audio.volume;
+        audio.volume = 0;
+        audio.currentTime = 0;
+
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              audio.pause();
+              audio.currentTime = 0;
+              audio.volume = originalVolume;
+            })
+            .catch((e) => console.log(`Warmup ${name} failed:`, e));
+        }
+      });
+    });
+    console.log('[Audio] Прогрев завершён');
   }
 
   play(name: SoundName, volume = 0.8) {
     const pool = this.sounds.get(name);
-    if (!pool) return;
+    if (!pool) {
+      console.warn(`[Audio] Звук ${name} не найден`);
+      return;
+    }
 
-    // Берём следующий аудио-элемент из пула (round-robin)
-    let idx = this.currentIndex.get(name) || 0;
-    const audio = pool[idx];
+    let audio = pool.find((a) => a.paused || a.ended);
 
-    // Обновляем индекс для следующего раза
-    idx = (idx + 1) % this.poolSize;
-    this.currentIndex.set(name, idx);
+    if (!audio) {
+      audio = pool[0];
+      audio.pause();
+      audio.currentTime = 0;
+    }
 
-    // Сбрасываем и воспроизводим
-    audio.currentTime = 0;
     audio.volume = volume;
-    audio.play().catch((e) => console.log('Audio play error:', e));
+    audio.currentTime = 0;
+
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((e) => console.log(`[Audio] Play ${name} error:`, e));
+    }
+  }
+
+  isReady() {
+    return this.ready;
   }
 }
 
-const audioPool = new AudioPool();
-
-// Регистрируем звуки при импорте модуля (один раз)
-audioPool.register('click', click);
-audioPool.register('success', success);
-audioPool.register('error', error);
-audioPool.register('engine', engine);
-audioPool.register('electro', electro);
+export const audioPreloader = new AudioPreloader();
 
 export const useQuestAudio = () => {
-  const play = (sound: SoundName) => {
-    audioPool.play(sound);
+  const [ready, setReady] = useState(audioPreloader.isReady());
+
+  useEffect(() => {
+    if (ready) {
+      return;
+    }
+
+    audioPreloader.preloadAll().then(() => {
+      setReady(true);
+    });
+  }, []);
+
+  const play = (name: SoundName) => {
+    if (!ready) {
+      console.warn('[Audio] Звуки ещё не загружены');
+      return;
+    }
+    audioPreloader.play(name);
   };
 
-  return { play };
+  return { play, ready };
 };

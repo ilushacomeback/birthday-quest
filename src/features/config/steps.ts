@@ -106,7 +106,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
       {
         label: 'Что-то не заводится',
         nextStepId: 'debt-question',
-        sound: 'engine',
+        sound: 'failedEngine',
       },
     ],
   },
