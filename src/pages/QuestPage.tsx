@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useUnit } from 'effector-react';
 import { audioManager } from '../model/audio';
 import { StepTransition } from '../shared/ui/StepTransition';
@@ -27,11 +27,11 @@ import {
   stepChanged,
   togglePathToPhotosFromStartPage,
 } from '../model/quest';
-import click from '../assets/sounds/click.mp3'
-import electro from '../assets/sounds/electro.mp3'
-import engine from '../assets/sounds/engine.mp3'
-import error from '../assets/sounds/error.mp3'
-import success from '../assets/sounds/success.mp3'
+import click from '../assets/sounds/click.mp3';
+import electro from '../assets/sounds/electro.mp3';
+import engine from '../assets/sounds/engine.mp3';
+import error from '../assets/sounds/error.mp3';
+import success from '../assets/sounds/success.mp3';
 
 export function QuestPage() {
   const currentStep = useUnit($currentStep);
@@ -51,16 +51,35 @@ export function QuestPage() {
     togglePathToPhotosFromStartPage,
   );
 
+  const [isAudioReady, setIsAudioReady] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    void audioManager
+      .registerMany([
+        { name: 'click', src: click },
+        { name: 'success', src: success },
+        { name: 'error', src: error },
+        { name: 'engine', src: engine },
+        { name: 'electro', src: electro },
+      ])
+      .then(() => {
+        if (mounted) {
+          setIsAudioReady(true);
+        }
+      })
+      .catch((e) => {
+        console.log('audio preload error', e);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   useEffect(() => {
     onAppStarted();
-
-    audioManager.registerMany([
-      { name: 'click', src: click },
-      { name: 'success', src: success },
-      { name: 'error', src: error },
-      { name: 'engine', src: engine },
-      { name: 'electro', src: electro },
-    ]);
   }, [onAppStarted]);
 
   const normalizeAnswer = (value: string) =>
@@ -71,20 +90,24 @@ export function QuestPage() {
       .replace(/[.,!?;:;"'`()-]/g, '')
       .replace(/\s+/g, ' ');
 
-  const handleStart = () => {
-    onQuestStarted();
+  const handleStart = async () => {
+    await audioManager.init();
     audioManager.play('electro');
+    onQuestStarted();
     onStepChanged(INITIAL_STEP_ID);
   };
 
-  const handleReplay = () => {
+  const handleReplay = async () => {
+    await audioManager.init();
+    audioManager.play('electro');
     onReplayStarted();
-    audioManager.play('electro');
     onQuestStarted();
     onStepChanged(INITIAL_STEP_ID);
   };
 
-  const handleGoToPhotos = () => {
+  const handleGoToPhotos = async () => {
+    await audioManager.init();
+    audioManager.play('electro');
     onStepChanged('memories');
     onTogglePathToPhotosFromStartPage(true);
   };
@@ -97,7 +120,6 @@ export function QuestPage() {
     console.log('change step', button);
     if (currentStep.id === INITIAL_STEP_ID) {
       onQuestStarted();
-      // await audioManager.unlock();
     }
 
     audioManager.play(button.sound ?? 'click');
@@ -122,7 +144,7 @@ export function QuestPage() {
     onAnswerSubmitted();
   };
 
-  if (!init) return <Loader />;
+  if (!init || !isAudioReady) return <Loader />;
 
   console.log('currentstate', currentStep);
 

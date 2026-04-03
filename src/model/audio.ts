@@ -1,34 +1,82 @@
+type RegisterItem = {
+  name: string;
+  src: string;
+};
+
 class AudioManager {
-  private sounds = new Map<string, HTMLAudioElement>();
+  private context: AudioContext | null = null;
+  private buffers = new Map<string, AudioBuffer>();
+  private initialized = false;
+  private loadingPromise: Promise<void> | null = null;
 
-  register(name: string, src: string) {
-    if (this.sounds.has(name)) return;
+  private getContext() {
+    if (!this.context) {
+      this.context = new AudioContext();
+    }
 
-    const audio = new Audio(src);
-    audio.preload = 'auto';
-
-    this.sounds.set(name, audio);
+    return this.context;
   }
 
-  registerMany(items: Array<{ name: string; src: string }>) {
-    items.forEach((item) => this.register(item.name, item.src));
+  async init() {
+    const context = this.getContext();
+
+    if (context.state === 'suspended') {
+      await context.resume();
+    }
+
+    this.initialized = true;
   }
 
-  play(name?: string) {
-    if (!name) return;
+  async registerMany(items: RegisterItem[]) {
+    if (this.loadingPromise) {
+      return this.loadingPromise;
+    }
 
-    const sound = this.sounds.get(name);
-    if (!sound) return;
+    this.loadingPromise = (async () => {
+      const context = this.getContext();
+
+      await Promise.all(
+        items.map(async ({ name, src }) => {
+          if (this.buffers.has(name)) return;
+
+          const response = await fetch(src);
+          const arrayBuffer = await response.arrayBuffer();
+          const audioBuffer = await context.decodeAudioData(arrayBuffer);
+
+          this.buffers.set(name, audioBuffer);
+        }),
+      );
+    })();
 
     try {
-      sound.currentTime = 0;
-      console.log('start play');
-      sound.play();
-      console.log('finish play');
-    } catch (e) {
-      console.log('play error', e);
-      //
+      await this.loadingPromise;
+    } finally {
+      this.loadingPromise = null;
     }
+  }
+
+  play(name?: string, volume = 1) {
+    if (!name) return;
+    if (!this.initialized) return;
+
+    const context = this.getContext();
+    const buffer = this.buffers.get(name);
+
+    if (!buffer) {
+      console.log(`Audio buffer "${name}" not loaded`);
+      return;
+    }
+
+    const source = context.createBufferSource();
+    source.buffer = buffer;
+
+    const gainNode = context.createGain();
+    gainNode.gain.value = volume;
+
+    source.connect(gainNode);
+    gainNode.connect(context.destination);
+
+    source.start(0);
   }
 }
 
