@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
 
 type TypewriterMode = 'append' | 'replace';
@@ -13,7 +13,8 @@ export type TypewriterLinesProps = {
   className?: string;
   mode?: TypewriterMode;
   showCursor?: boolean;
-  onSound: () => void;
+  onSound?: () => void;
+  typeSoundIntervalMs?: number;
   getLineColorClassName?: (params: {
     line: string;
     lineIndex: number;
@@ -37,6 +38,7 @@ export const TypewriterLines = ({
   mode = 'append',
   showCursor = true,
   onSound,
+  typeSoundIntervalMs = 65,
   getLineColorClassName,
   getCursorColorClassName,
 }: TypewriterLinesProps) => {
@@ -47,7 +49,22 @@ export const TypewriterLines = ({
   const [completedLines, setCompletedLines] = useState<string[]>([]);
   const [phase, setPhase] = useState<TypewriterPhase>('typing');
 
-  const lastSoundCharRef = useRef<number>(-1);
+  const lastTypeSoundAtRef = useRef(0);
+
+  const tryPlayTypeSound = useCallback(
+    (char: string) => {
+      if (!onSound) return;
+      if (!/\S/.test(char)) return;
+
+      const now = performance.now();
+
+      if (now - lastTypeSoundAtRef.current >= typeSoundIntervalMs) {
+        onSound();
+        lastTypeSoundAtRef.current = now;
+      }
+    },
+    [onSound, typeSoundIntervalMs],
+  );
 
   useEffect(() => {
     if (!safeLines.length) {
@@ -65,18 +82,8 @@ export const TypewriterLines = ({
     if (mode === 'append') {
       const timeout = window.setTimeout(() => {
         if (charIndex < currentLine.length) {
-          const nextCharIndex = charIndex + 1;
-          const nextChar = currentLine[nextCharIndex - 1];
-
-          if (
-            onSound &&
-            nextCharIndex !== lastSoundCharRef.current &&
-            /\S/.test(nextChar)
-          ) {
-            onSound();
-            lastSoundCharRef.current = nextCharIndex;
-          }
-
+          const nextChar = currentLine[charIndex] ?? '';
+          tryPlayTypeSound(nextChar);
           setCharIndex((prev) => prev + 1);
           return;
         }
@@ -84,7 +91,6 @@ export const TypewriterLines = ({
         setCompletedLines((prev) => [...prev, currentLine]);
         setLineIndex((prev) => prev + 1);
         setCharIndex(0);
-        lastSoundCharRef.current = -1;
       }, speed);
 
       return () => window.clearTimeout(timeout);
@@ -93,18 +99,8 @@ export const TypewriterLines = ({
     if (phase === 'typing') {
       const timeout = window.setTimeout(() => {
         if (charIndex < currentLine.length) {
-          const nextCharIndex = charIndex + 1;
-          const nextChar = currentLine[nextCharIndex - 1];
-
-          if (
-            onSound &&
-            nextCharIndex !== lastSoundCharRef.current &&
-            /\S/.test(nextChar)
-          ) {
-            onSound();
-            lastSoundCharRef.current = nextCharIndex;
-          }
-
+          const nextChar = currentLine[charIndex] ?? '';
+          tryPlayTypeSound(nextChar);
           setCharIndex((prev) => prev + 1);
           return;
         }
@@ -133,7 +129,6 @@ export const TypewriterLines = ({
         setLineIndex((prev) => prev + 1);
         setCharIndex(0);
         setPhase('typing');
-        lastSoundCharRef.current = -1;
       }, eraseSpeed);
 
       return () => window.clearTimeout(timeout);
@@ -149,6 +144,8 @@ export const TypewriterLines = ({
     mode,
     phase,
     onSound,
+    typeSoundIntervalMs,
+    tryPlayTypeSound,
   ]);
 
   const currentLine = safeLines[lineIndex] ?? '';

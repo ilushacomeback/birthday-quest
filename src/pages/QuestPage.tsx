@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'; // убрал useState
+import { useCallback, useEffect, useState } from 'react'; // убрал useState
 import { useUnit } from 'effector-react';
 import { StepTransition } from '../shared/StepTransition';
 import { DefaultStepCard } from '../features/ui/DefaultStepCard';
@@ -85,9 +85,9 @@ export function QuestPage() {
     onStepChanged('secret');
   };
 
-  const soundTypewriter = () => {
+  const soundTypewriter = useCallback(() => {
     play('typewriter');
-  };
+  }, [play]);
 
   const handleError = (isError: boolean) => {
     if (isError) {
