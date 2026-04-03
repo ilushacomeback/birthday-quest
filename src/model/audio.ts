@@ -55,7 +55,7 @@ class AudioManager {
     }
   }
 
-  play(name?: string, volume = 1) {
+  play(name?: string, volume = 100) {
     if (!name) return;
     if (!this.initialized) return;
 
