@@ -63,26 +63,34 @@ export function QuestPage() {
 
   const handleStart = () => {
     play('electro');
-    onQuestStarted();
-    onStepChanged(INITIAL_STEP_ID);
+    window.setTimeout(() => {
+      onQuestStarted();
+      onStepChanged(INITIAL_STEP_ID);
+    }, 100);
   };
 
   const handleReplay = () => {
     play('electro');
-    onReplayStarted();
-    onQuestStarted();
-    onStepChanged(INITIAL_STEP_ID);
+    window.setTimeout(() => {
+      onReplayStarted();
+      onQuestStarted();
+      onStepChanged(INITIAL_STEP_ID);
+    }, 100);
   };
 
   const handleGoToPhotos = () => {
     play('click');
-    onStepChanged('memories');
-    onTogglePathToPhotosFromStartPage(true);
+    window.setTimeout(() => {
+      onStepChanged('memories');
+      onTogglePathToPhotosFromStartPage(true);
+    }, 100);
   };
 
   const handleSecret = () => {
     play('click');
-    onStepChanged('secret');
+    window.setTimeout(() => {
+      onStepChanged('secret');
+    }, 100);
   };
 
   const soundTypewriter = useCallback(() => {
@@ -151,7 +159,7 @@ export function QuestPage() {
       play('success');
     }
 
-    onAnswerSubmitted();
+    window.setTimeout(() => onAnswerSubmitted(), 100);
   };
 
   if (!init || !ready) return <Loader />;
