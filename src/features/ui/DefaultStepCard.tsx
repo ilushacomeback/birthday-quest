@@ -5,12 +5,15 @@ import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { DefaultLines } from '../../shared/lines/DefaultLines';
 import { LoadingLines } from '../../shared/lines/LoadingLines';
+import type { TypewriterLinesProps } from '../../shared/lines/TypewriterLines';
 
 type DefaultStepCardProps = {
   lines: string[];
   loadingLines?: string[];
   buttons: TQuestButton[];
   onButtonClick: (button: TQuestButton) => void;
+  onSound: TypewriterLinesProps['onSound'];
+  isError?: boolean;
 };
 
 export function DefaultStepCard({
@@ -18,20 +21,27 @@ export function DefaultStepCard({
   loadingLines,
   buttons,
   onButtonClick,
+  onSound,
+  isError,
 }: DefaultStepCardProps) {
   const [showMainText, setShowMainText] = useState(!loadingLines?.length);
   const [showButtons, setShowButtons] = useState(!lines.length);
 
   return (
-    <ScreenCard text='memory_session_active'>
+    <ScreenCard text="memory_session_active" isError={isError}>
       {loadingLines && (
         <LoadingLines
           lines={loadingLines}
           onComplete={() => setShowMainText(true)}
+          onSound={onSound}
         />
       )}
       {showMainText && (
-        <DefaultLines lines={lines} onComplete={() => setShowButtons(true)} />
+        <DefaultLines
+          lines={lines}
+          onComplete={() => setShowButtons(true)}
+          onSound={onSound}
+        />
       )}
       <AnimatePresence>
         {showButtons && (
@@ -41,11 +51,12 @@ export function DefaultStepCard({
             exit={{ opacity: 0, y: 6, scale: 0.96 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
           >
-            <div className="space-y-3">
+            <div className="flex gap-5">
               {buttons.map((button) => (
                 <QuestButton
                   key={`${button.label}-${button.nextStepId}`}
                   onClick={() => onButtonClick(button)}
+                  variant={button.variant}
                 >
                   {button.label}
                 </QuestButton>

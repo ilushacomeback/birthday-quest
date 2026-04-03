@@ -6,6 +6,7 @@ import error from '../assets/sounds/error.mp3';
 import engine from '../assets/sounds/engine.mp3';
 import electro from '../assets/sounds/electro.mp3';
 import failedEngine from '../assets/sounds/failed-engine.mp3';
+import typewriter from '../assets/sounds/typewriter.mp3';
 import type { SoundName } from '../features/config/types';
 
 
@@ -22,6 +23,7 @@ class AudioPreloader {
       { name: 'engine', src: engine },
       { name: 'electro', src: electro },
       { name: 'failedEngine', src: failedEngine },
+      { name: 'typewriter', src: typewriter },
     ];
 
     const loadPromises: Promise<void>[] = [];
@@ -34,7 +36,6 @@ class AudioPreloader {
         audio.preload = 'auto';
         audio.volume = 0.8;
 
-        // Ждём загрузки каждого аудио
         const loadPromise = new Promise<void>((resolve) => {
           if (audio.readyState >= 2) {
             resolve();
@@ -42,7 +43,7 @@ class AudioPreloader {
             audio.addEventListener('canplaythrough', () => resolve(), {
               once: true,
             });
-            audio.load(); // Принудительно начинаем загрузку
+            audio.load();
           }
         });
 
@@ -53,36 +54,11 @@ class AudioPreloader {
       this.sounds.set(name, pool);
     }
 
-    // Ждём загрузки ВСЕХ звуков
     await Promise.all(loadPromises);
     this.ready = true;
     console.log('[Audio] Все звуки предзагружены');
-
-    // Прогреваем звуки (воспроизводим на долю секунды с громкостью 0)
-    this.warmup();
   }
 
-  private warmup() {
-    this.sounds.forEach((pool, name) => {
-      pool.forEach((audio) => {
-        const originalVolume = audio.volume;
-        audio.volume = 0;
-        audio.currentTime = 0;
-
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              audio.pause();
-              audio.currentTime = 0;
-              audio.volume = originalVolume;
-            })
-            .catch((e) => console.log(`Warmup ${name} failed:`, e));
-        }
-      });
-    });
-    console.log('[Audio] Прогрев завершён');
-  }
 
   play(name: SoundName, volume = 0.8) {
     const pool = this.sounds.get(name);
@@ -126,7 +102,7 @@ export const useQuestAudio = () => {
     audioPreloader.preloadAll().then(() => {
       setReady(true);
     });
-    
+
   }, [ready]);
 
   const play = (name: SoundName) => {

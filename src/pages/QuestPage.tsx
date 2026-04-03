@@ -1,4 +1,4 @@
-import { useEffect } from 'react'; // убрал useState
+import { useEffect, useState } from 'react'; // убрал useState
 import { useUnit } from 'effector-react';
 import { StepTransition } from '../shared/StepTransition';
 import { DefaultStepCard } from '../features/ui/DefaultStepCard';
@@ -29,6 +29,7 @@ import {
 import { useQuestAudio } from '../hooks/useQuestAudio'; // импортируем хук
 
 export function QuestPage() {
+  const [isAnswerError, setIsAnswerError] = useState(false);
   const currentStep = useUnit($currentStep);
   const currentAnswer = useUnit($currentAnswer);
   const started = useUnit($started);
@@ -79,8 +80,33 @@ export function QuestPage() {
     onTogglePathToPhotosFromStartPage(true);
   };
 
+  const handleSecret = () => {
+    play('click');
+    onStepChanged('secret');
+  };
+
+  const soundTypewriter = () => {
+    play('typewriter');
+  };
+
+  const handleError = (isError: boolean) => {
+    if (isError) {
+      setIsAnswerError(true);
+
+      window.setTimeout(() => {
+        setIsAnswerError(false);
+      }, 450);
+
+      return;
+    }
+
+    setIsAnswerError(false);
+  };
+
   const handleDefaultButtonClick = (button: TQuestButton) => {
     console.log('change step', button);
+
+    handleError(false);
 
     if (currentStep.id === INITIAL_STEP_ID) {
       onQuestStarted();
@@ -88,6 +114,11 @@ export function QuestPage() {
 
     const soundName = button.sound ?? 'click';
     play(soundName);
+
+    if (button.variant === 'error') {
+      handleError(true);
+      return;
+    }
 
     onStepChanged(button.nextStepId);
   };
@@ -102,16 +133,24 @@ export function QuestPage() {
 
     if (!ok) {
       const errorSound = currentStep.errorSound ?? 'error';
+
       if (errorSound === 'error') {
         play('error');
       }
+
+      handleError(true);
+
       return;
     }
 
+    handleError(false);
+
     const successSound = currentStep.successSound ?? 'success';
+
     if (successSound === 'success') {
       play('success');
     }
+
     onAnswerSubmitted();
   };
 
@@ -140,7 +179,7 @@ export function QuestPage() {
               <CompletedScreen
                 onReplay={handleReplay}
                 onGoToPhotos={handleGoToPhotos}
-                onSecret={() => onStepChanged('secret')}
+                onSecret={handleSecret}
               />
             )}
 
@@ -150,6 +189,8 @@ export function QuestPage() {
                 loadingLines={currentStep.loadingLines}
                 buttons={currentStep.buttons}
                 onButtonClick={handleDefaultButtonClick}
+                onSound={soundTypewriter}
+                isError={isAnswerError}
               />
             )}
 
@@ -161,6 +202,8 @@ export function QuestPage() {
                 submitLabel={currentStep.submitLabel}
                 onChange={onAnswerChanged}
                 onSubmit={handleAnswerSubmit}
+                onSound={soundTypewriter}
+                isError={isAnswerError}
               />
             )}
 

@@ -1,7 +1,13 @@
-import type { INITIAL_STEP_ID } from "./constants";
+import type { INITIAL_STEP_ID } from './constants';
 
-
-export type SoundName = 'click' | 'success' | 'error' | 'engine' | 'electro' | 'failedEngine';
+export type SoundName =
+  | 'click'
+  | 'success'
+  | 'error'
+  | 'engine'
+  | 'electro'
+  | 'failedEngine'
+  | 'typewriter';
 
 export type QuestStepId =
   | typeof INITIAL_STEP_ID
@@ -18,10 +24,13 @@ export type QuestStepId =
   | 'completed'
   | 'secret';
 
+export type QuestButtonVariant = 'default' | 'error'
+
 export type TQuestButton = {
   label: string;
   sound?: SoundName;
   nextStepId: QuestStepId;
+  variant?: QuestButtonVariant;
 };
 
 export type BaseStep = {

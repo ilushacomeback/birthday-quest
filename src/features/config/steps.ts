@@ -1,5 +1,5 @@
 import type { QuestStep, QuestStepId } from './types';
-import bear from '../../assets/images/bear.jpg'
+import bear from '../../assets/images/bear.jpg';
 import call from '../../assets/images/call.jpg';
 import fuck from '../../assets/images/fuck.jpg';
 import legenda from '../../assets/images/legenda.jpg';
@@ -40,9 +40,16 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
     ],
     buttons: [
       {
+        label: 'Нет',
+        nextStepId: INITIAL_STEP_ID,
+        sound: 'error',
+        variant: 'error'
+      },
+      {
         label: 'Да',
         nextStepId: 'beer-question',
         sound: 'click',
+        variant: 'default'
       },
     ],
   },
@@ -76,6 +83,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
         label: 'А может ещё по одной?',
         nextStepId: 'car-question',
         sound: 'click',
+        variant: 'default'
       },
     ],
   },
@@ -107,6 +115,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
         label: 'Завести',
         nextStepId: 'debt-question',
         sound: 'failedEngine',
+        variant: 'default'
       },
     ],
   },
@@ -139,6 +148,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
         label: 'Заправиться',
         nextStepId: 'engine-start',
         sound: 'engine',
+        variant: 'default'
       },
     ],
   },
@@ -156,6 +166,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
         label: 'Газ',
         sound: 'click',
         nextStepId: 'memories',
+        variant: 'default'
       },
     ],
   },
@@ -193,6 +204,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
         label: 'Дальше',
         nextStepId: 'carpet-question',
         sound: 'click',
+        variant: 'default'
       },
     ],
   },
@@ -228,6 +240,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
         label: 'Завершить сканирование',
         sound: 'click',
         nextStepId: 'completed',
+        variant: 'default'
       },
     ],
   },

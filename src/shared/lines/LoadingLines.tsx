@@ -3,7 +3,8 @@ import { TypewriterLines, type TypewriterLinesProps } from './TypewriterLines';
 export const LoadingLines = ({
   lines,
   onComplete,
-}: Pick<TypewriterLinesProps, 'lines' | 'onComplete'>) => {
+  onSound,
+}: Pick<TypewriterLinesProps, 'lines' | 'onComplete' | 'onSound'>) => {
   return (
     <TypewriterLines
       key={`loading-${lines.join('|')}`}
@@ -13,6 +14,7 @@ export const LoadingLines = ({
       getLineColorClassName={() => 'text-green-300'}
       getCursorColorClassName={() => 'bg-green-400'}
       onComplete={onComplete}
+      onSound={onSound}
     />
   );
 };

@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { QuestButton } from '../../shared/QuestButton';
 import { ScreenCard } from '../../shared/ScreenCard';
 import { DefaultLines } from '../../shared/lines/DefaultLines';
+import type { TypewriterLinesProps } from '../../shared/lines/TypewriterLines';
 
 type AnswerStepCardProps = {
   lines: string[];
@@ -12,6 +13,8 @@ type AnswerStepCardProps = {
   submitLabel: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
+  onSound: TypewriterLinesProps['onSound'];
+  isError?: boolean;
 };
 
 export function AnswerStepCard({
@@ -21,6 +24,8 @@ export function AnswerStepCard({
   submitLabel,
   onChange,
   onSubmit,
+  onSound,
+  isError,
 }: AnswerStepCardProps) {
   const [showInput, setShowInput] = useState(false);
   const [isHintOpen, setIsHintOpen] = useState(false);
@@ -52,8 +57,12 @@ export function AnswerStepCard({
   }, [isHintOpen]);
 
   return (
-    <ScreenCard text='memory_session_active'>
-      <DefaultLines lines={lines} onComplete={() => setShowInput(true)} />
+    <ScreenCard text="memory_session_active" isError={isError}>
+      <DefaultLines
+        lines={lines}
+        onComplete={() => setShowInput(true)}
+        onSound={onSound}
+      />
       <AnimatePresence>
         {showInput && (
           <motion.div
@@ -112,7 +121,9 @@ export function AnswerStepCard({
                   </div>
                 )}
               </div>
-              <QuestButton type="submit">{submitLabel}</QuestButton>
+              <QuestButton type="submit" variant="default">
+                {submitLabel}
+              </QuestButton>
             </form>
           </motion.div>
         )}
