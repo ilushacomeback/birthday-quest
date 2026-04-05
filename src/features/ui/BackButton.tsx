@@ -1,26 +1,15 @@
 import { QuestButton } from '../../shared/QuestButton';
-import clsx from 'clsx';
+import { IoMdArrowBack } from 'react-icons/io';
 
 type BackButtonProps = {
   handleBack: () => void;
-  variant?: 'icon' | 'text';
+  className?: string;
 };
 
-export const BackButton = ({
-  handleBack,
-  variant = 'icon',
-}: BackButtonProps) => {
-  const isIcon = variant === 'icon';
-
+export const BackButton = ({ handleBack, className }: BackButtonProps) => {
   return (
-    <QuestButton
-      onClick={() => handleBack()}
-      className={clsx(
-        'text-sm flex items-center justify-center',
-        isIcon ? 'px-4 py-3 h-full' : 'px-3 py-1.5',
-      )}
-    >
-      {isIcon ? <span className="text-lg leading-none">←</span> : 'Вернуться'}
+    <QuestButton className={className} onClick={() => handleBack()}>
+      <IoMdArrowBack size={24} />
     </QuestButton>
   );
 };

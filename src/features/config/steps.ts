@@ -23,6 +23,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
   [INITIAL_STEP_ID]: {
     id: INITIAL_STEP_ID,
     type: 'default',
+    nextStepId: 'beer-question',
     loadingLines: [
       'Инициализация системы...',
       'Сканирование...',
@@ -59,6 +60,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
     type: 'default',
     noBackBtn: true,
     lines: ['Хм, не ожидал от тебя такого.', 'Теперь у тебя не будет выбора.'],
+    nextStepId: 'beer-question',
     buttons: [
       {
         label: 'Начать путешествие',
@@ -96,6 +98,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
     id: 'beer-found',
     type: 'default',
     prevStepId: 'beer-question',
+    nextStepId: 'car-question',
     lines: [
       'Вот он, настоящий мужчина.',
       'Диагностика показала: 100% свой человек.',
@@ -144,6 +147,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
     id: 'car-found',
     type: 'default',
     prevStepId: 'car-question',
+    nextStepId: 'debt-question',
     lines: [
       'Молодец! Но в нашем путешествии можно всё, так что иди в гараж (шкаф, верхняя полка) и заводи малышку.',
     ],
@@ -187,6 +191,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
     id: 'debt-found',
     type: 'default',
     prevStepId: 'debt-question',
+    nextStepId: 'engine-start',
     lines: [
       'Отлично, нам как раз хватит чутка подзаправиться!',
       'Да-да, он же тебе вернул их..., но ничего страшного, подойди к нему и скажи, что накапали проценты.',
@@ -205,6 +210,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
     id: 'engine-start',
     type: 'default',
     prevStepId: 'debt-found',
+    nextStepId: 'memories',
     lines: [
       'Уух, с пол тычка заревела.',
       'К Кулибину бы на покраску её и вообще шикардосик был бы.',
@@ -224,6 +230,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
     id: 'memories',
     type: 'carousel',
     prevStepId: 'engine-start',
+    nextStepId: 'carpet-question',
     images: [
       {
         src: see,
@@ -331,6 +338,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
     id: 'final',
     type: 'default',
     prevStepId: 'carpet-question',
+    nextStepId: 'completed',
     lines: [
       'Точно, супер! Загляни-ка в стиральную машинку, там тебя ждёт новенький ковёр.',
       'Не совсем тот, который был, но и этот вроде неплох.',

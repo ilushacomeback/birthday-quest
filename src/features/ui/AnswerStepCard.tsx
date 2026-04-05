@@ -16,6 +16,7 @@ type AnswerStepCardProps = {
   onSound: TypewriterLinesProps['onSound'];
   isError?: boolean;
   handleBack?: () => void
+  handleNext?: () => void
 };
 
 export function AnswerStepCard({
@@ -27,7 +28,8 @@ export function AnswerStepCard({
   onSubmit,
   onSound,
   isError,
-  handleBack
+  handleBack,
+  handleNext
 }: AnswerStepCardProps) {
   const [showInput, setShowInput] = useState(false);
   const [isHintOpen, setIsHintOpen] = useState(false);
@@ -58,11 +60,13 @@ export function AnswerStepCard({
     };
   }, [isHintOpen]);
 
+  console.log('handleNext', handleNext)
+
   return (
     <ScreenCard
-      text="memory_session_active"
       isError={isError}
       handleBack={handleBack}
+      handleNext={handleNext}
     >
       <DefaultLines
         lines={lines}

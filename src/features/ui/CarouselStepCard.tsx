@@ -11,14 +11,16 @@ type CarouselStepCardProps = {
   images: CarouselStep['images'];
   buttons: TQuestButton[];
   onButtonClick: (button: TQuestButton) => void;
-  handleBack: (prevStepId?: QuestStepId) => void
+  handleBack?: (prevStepId?: QuestStepId) => void;
+  handleNext?: () => void;
 };
 
 export const CarouselStepCard = ({
   images,
   buttons,
   onButtonClick,
-  handleBack
+  handleBack,
+  handleNext,
 }: CarouselStepCardProps) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
@@ -70,7 +72,12 @@ export const CarouselStepCard = ({
   console.log('pathToPhotosFromStartPage', pathToPhotosFromStartPage);
 
   return (
-    <ScreenCard text="memory_session_active" handleBack={pathToPhotosFromStartPage ? () => handleBack('completed') : handleBack}>
+    <ScreenCard
+      handleBack={
+        pathToPhotosFromStartPage ? () => handleBack?.('completed') : handleBack
+      }
+      handleNext={pathToPhotosFromStartPage ? undefined : handleNext}
+    >
       <div className="space-y-4">
         <div className="overflow-hidden rounded-3xl" ref={emblaRef}>
           <div className="flex">

@@ -15,6 +15,7 @@ type DefaultStepCardProps = {
   handleBack?: () => void;
   onSound: TypewriterLinesProps['onSound'];
   isError?: boolean;
+  handleNext?: () => void;
 };
 
 export function DefaultStepCard({
@@ -25,6 +26,7 @@ export function DefaultStepCard({
   onSound,
   isError,
   handleBack,
+  handleNext,
 }: DefaultStepCardProps) {
   const [showMainText, setShowMainText] = useState(!loadingLines?.length);
   const [showButtons, setShowButtons] = useState(!lines.length);
@@ -33,9 +35,9 @@ export function DefaultStepCard({
 
   return (
     <ScreenCard
-      text="memory_session_active"
       isError={isError}
       handleBack={handleBack}
+      handleNext={handleNext}
     >
       {loadingLines && (
         <LoadingLines

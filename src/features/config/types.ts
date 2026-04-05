@@ -39,7 +39,8 @@ export type BaseStep = {
   lines: string[];
   loadingLines?: string[];
   prevStepId?: QuestStepId;
-  noBackBtn?: boolean
+  noBackBtn?: boolean;
+  nextStepId: QuestStepId;
 };
 
 export type DefaultStep = BaseStep & {
@@ -54,7 +55,6 @@ export type AnswerStep = BaseStep & {
   submitLabel: string;
   successSound?: string;
   errorSound?: string;
-  nextStepId: QuestStepId;
 };
 
 type Image = {
@@ -68,6 +68,7 @@ export type CarouselStep = {
   images: Image[];
   buttons: TQuestButton[];
   prevStepId: QuestStepId;
+  nextStepId: QuestStepId,
 };
 
 export type CompletedStep = {

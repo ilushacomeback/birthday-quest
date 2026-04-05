@@ -133,6 +133,7 @@ export function QuestPage() {
     'noBackBtn' in currentStep && currentStep.noBackBtn
       ? undefined
       : (prevStepId?: QuestStepId) => {
+        console.log('prevStepId', prevStepId)
           if (prevStepId) {
             onStepChanged(prevStepId);
             return;
@@ -146,6 +147,12 @@ export function QuestPage() {
             return;
           }
         };
+
+  const handleNext = () => {
+    if ('nextStepId' in currentStep && currentStep.nextStepId) {
+      onStepChanged(currentStep.nextStepId);
+    }
+  };
 
   const handleAnswerSubmit = async () => {
     if (currentStep.type !== 'answer') return;
@@ -217,6 +224,7 @@ export function QuestPage() {
                 onSound={soundTypewriter}
                 isError={isAnswerError}
                 handleBack={handleBack}
+                handleNext={finished ? handleNext : undefined}
               />
             )}
 
@@ -232,6 +240,7 @@ export function QuestPage() {
                 onSound={soundTypewriter}
                 isError={isAnswerError}
                 handleBack={handleBack}
+                handleNext={finished ? handleNext : undefined}
               />
             )}
 
@@ -240,15 +249,13 @@ export function QuestPage() {
                 images={currentStep.images}
                 buttons={currentStep.buttons}
                 onButtonClick={handleDefaultButtonClick}
-                handleBack={() => handleBack?.()}
+                handleBack={handleBack}
+                handleNext={finished ? handleNext : undefined}
               />
             )}
 
             {currentStep.type === 'secret' && (
-              <ScreenCard
-                text="session_complete"
-                handleBack={() => handleBack?.('completed')}
-              >
+              <ScreenCard handleBack={() => handleBack?.('completed')}>
                 <div className="space-y-2 text-zinc-100">
                   {currentStep.lines.map((line, index) => (
                     <div
