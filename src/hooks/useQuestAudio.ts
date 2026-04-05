@@ -8,190 +8,286 @@ import failedEngine from '../assets/sounds/failed-engine.mp3';
 import typewriter from '../assets/sounds/typewriter.mp3';
 import type { SoundName } from '../features/config/types';
 
-class AudioPreloader {
-  private sounds: Map<SoundName, HTMLAudioElement[]> = new Map();
+type SoundConfig = {
+  src: string;
+  volume: number;
+  loop?: boolean;
+  minIntervalMs?: number;
+};
+
+type ActivePlayback = {
+  source: AudioBufferSourceNode;
+  gainNode: GainNode;
+};
+
+class AudioManager {
+  private context: AudioContext | null = null;
+  private masterGain: GainNode | null = null;
+  private buffers = new Map<SoundName, AudioBuffer>();
   private ready = false;
-  private poolSize = 2;
-
-  private audioContext: AudioContext | null = null;
-  private typewriterBuffer: AudioBuffer | null = null;
-  private typewriterGain: GainNode | null = null;
-  private typewriterLastPlayAt = 0;
-  private typewriterMinIntervalMs = 90;
   private unlocked = false;
+  private loadingPromise: Promise<void> | null = null;
 
-  private getAudioContext() {
-    if (this.audioContext) return this.audioContext;
+  private active = new Map<SoundName, Set<ActivePlayback>>();
+  private lastPlayAt = new Map<SoundName, number>();
+
+  private soundConfig: Record<SoundName, SoundConfig> = {
+    click: {
+      src: click,
+      volume: 0.8,
+      minIntervalMs: 40,
+    },
+    success: {
+      src: success,
+      volume: 0.9,
+      minIntervalMs: 80,
+    },
+    error: {
+      src: error,
+      volume: 0.9,
+      minIntervalMs: 80,
+    },
+    engine: {
+      src: engine,
+      volume: 0.7,
+      loop: true,
+      minIntervalMs: 120,
+    },
+    electro: {
+      src: electro,
+      volume: 0.85,
+      minIntervalMs: 60,
+    },
+    failedEngine: {
+      src: failedEngine,
+      volume: 0.9,
+      minIntervalMs: 100,
+    },
+    typewriter: {
+      src: typewriter,
+      volume: 0.35,
+      minIntervalMs: 90,
+    },
+  };
+
+  private getContext() {
+    if (this.context) return this.context;
 
     const AudioContextCtor =
       window.AudioContext ||
       (window as typeof window & { webkitAudioContext?: typeof AudioContext })
         .webkitAudioContext;
 
-    if (!AudioContextCtor) return null;
+    if (!AudioContextCtor) {
+      console.warn('[Audio] AudioContext is not supported');
+      return null;
+    }
 
-    this.audioContext = new AudioContextCtor();
-    this.typewriterGain = this.audioContext.createGain();
-    this.typewriterGain.gain.value = 0.35;
-    this.typewriterGain.connect(this.audioContext.destination);
+    this.context = new AudioContextCtor();
+    this.masterGain = this.context.createGain();
+    this.masterGain.gain.value = 1;
+    this.masterGain.connect(this.context.destination);
 
-    return this.audioContext;
+    return this.context;
+  }
+
+  async preloadAll() {
+    if (this.ready) return;
+    if (this.loadingPromise) return this.loadingPromise;
+
+    this.loadingPromise = (async () => {
+      const ctx = this.getContext();
+      if (!ctx) return;
+
+      const entries = Object.entries(this.soundConfig) as [
+        SoundName,
+        SoundConfig,
+      ][];
+
+      await Promise.all(
+        entries.map(async ([name, config]) => {
+          const response = await fetch(config.src);
+          const arrayBuffer = await response.arrayBuffer();
+          const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+          this.buffers.set(name, audioBuffer);
+        }),
+      );
+
+      this.ready = true;
+      console.log('[Audio] All sounds preloaded');
+    })();
+
+    return this.loadingPromise;
   }
 
   async unlock() {
-    const ctx = this.getAudioContext();
-    if (!ctx || this.unlocked) return;
+    const ctx = this.getContext();
+    if (!ctx) return;
 
     if (ctx.state !== 'running') {
       await ctx.resume();
     }
 
     this.unlocked = true;
-  }
 
-  async preloadAll() {
-    const items: { name: Exclude<SoundName, 'typewriter'>; src: string }[] = [
-      { name: 'click', src: click },
-      { name: 'success', src: success },
-      { name: 'error', src: error },
-      { name: 'engine', src: engine },
-      { name: 'electro', src: electro },
-      { name: 'failedEngine', src: failedEngine },
-    ];
+    // тихий "прогрев" для iOS
+    const silentBuffer = ctx.createBuffer(1, 1, ctx.sampleRate);
+    const source = ctx.createBufferSource();
+    const gain = ctx.createGain();
 
-    const loadPromises: Promise<void>[] = [];
+    gain.gain.value = 0;
+    source.buffer = silentBuffer;
+    source.connect(gain);
+    gain.connect(this.masterGain!);
+    source.start(0);
 
-    for (const { name, src } of items) {
-      const pool: HTMLAudioElement[] = [];
-
-      for (let i = 0; i < this.poolSize; i++) {
-        const audio = new Audio(src);
-        audio.preload = 'auto';
-        audio.volume = 0.8;
-
-        const loadPromise = new Promise<void>((resolve) => {
-          if (audio.readyState >= 2) {
-            resolve();
-            return;
-          }
-
-          const done = () => resolve();
-
-          audio.addEventListener('canplaythrough', done, { once: true });
-          audio.addEventListener('loadeddata', done, { once: true });
-          audio.addEventListener('error', done, { once: true });
-
-          audio.load();
-        });
-
-        loadPromises.push(loadPromise);
-        pool.push(audio);
-      }
-
-      this.sounds.set(name, pool);
-    }
-
-    const ctx = this.getAudioContext();
-
-    const typewriterPromise = (async () => {
-      if (!ctx) return;
-
-      const response = await fetch(typewriter);
-      const arrayBuffer = await response.arrayBuffer();
-      this.typewriterBuffer = await ctx.decodeAudioData(arrayBuffer);
-    })();
-
-    await Promise.all([...loadPromises, typewriterPromise]);
-
-    this.ready = true;
-    console.log('[Audio] Все звуки предзагружены');
+    console.log('[Audio] Unlocked');
   }
 
   play(name: SoundName) {
-    if (name === 'typewriter') {
-      this.playTypewriter();
+    const ctx = this.getContext();
+    const masterGain = this.masterGain;
+    const buffer = this.buffers.get(name);
+    const config = this.soundConfig[name];
+
+    if (!ctx || !masterGain || !buffer) {
+      console.warn(`[Audio] Sound ${name} is not ready`);
       return;
     }
 
-    const pool = this.sounds.get(name);
-    if (!pool) {
-      console.warn(`[Audio] Звук ${name} не найден`);
+    if (!this.unlocked) {
+      console.warn(`[Audio] Sound ${name} skipped: audio is locked`);
       return;
     }
 
-    let audio = pool.find((a) => a.paused || a.ended);
-
-    if (!audio) {
-      audio = pool[0];
-      audio.pause();
-      audio.currentTime = 0;
-    }
-
-    audio.volume = 0.9;
-    audio.currentTime = 0;
-
-    const playPromise = audio.play();
-    if (playPromise !== undefined) {
-      playPromise.catch((e) => console.log(`[Audio] Play ${name} error:`, e));
-    }
-  }
-
-  private playTypewriter() {
     const now = performance.now();
+    const lastPlayAt = this.lastPlayAt.get(name) ?? 0;
+    const minIntervalMs = config.minIntervalMs ?? 0;
 
-    if (now - this.typewriterLastPlayAt < this.typewriterMinIntervalMs) {
+    if (now - lastPlayAt < minIntervalMs) {
       return;
     }
 
-    const ctx = this.getAudioContext();
-
-    if (
-      !ctx ||
-      !this.typewriterBuffer ||
-      !this.typewriterGain ||
-      !this.unlocked
-    ) {
-      return;
+    if (config.loop) {
+      this.stop(name);
     }
 
     const source = ctx.createBufferSource();
-    source.buffer = this.typewriterBuffer;
-    source.connect(this.typewriterGain);
-    source.start(0);
+    source.buffer = buffer;
+    source.loop = !!config.loop;
 
-    this.typewriterLastPlayAt = now;
+    const gainNode = ctx.createGain();
+    gainNode.gain.value = config.volume;
+
+    source.connect(gainNode);
+    gainNode.connect(masterGain);
+
+    const playback: ActivePlayback = { source, gainNode };
+
+    if (!this.active.has(name)) {
+      this.active.set(name, new Set());
+    }
+
+    this.active.get(name)!.add(playback);
+
+    source.onended = () => {
+      const activeSet = this.active.get(name);
+      activeSet?.delete(playback);
+      if (activeSet && activeSet.size === 0) {
+        this.active.delete(name);
+      }
+    };
+
+    try {
+      source.start(0);
+      this.lastPlayAt.set(name, now);
+    } catch (error) {
+      console.log(`[Audio] Play ${name} error:`, error);
+      this.active.get(name)?.delete(playback);
+    }
+  }
+
+  stop(name: SoundName) {
+    const activeSet = this.active.get(name);
+    if (!activeSet?.size) return;
+
+    for (const playback of activeSet) {
+      try {
+        playback.source.stop(0);
+      } catch {
+        //
+      }
+    }
+
+    this.active.delete(name);
+  }
+
+  stopAll() {
+    for (const [name] of this.active) {
+      this.stop(name);
+    }
+  }
+
+  setVolume(name: SoundName, volume: number) {
+    this.soundConfig[name] = {
+      ...this.soundConfig[name],
+      volume,
+    };
   }
 
   isReady() {
     return this.ready;
   }
+
+  isUnlocked() {
+    return this.unlocked;
+  }
 }
 
-export const audioPreloader = new AudioPreloader();
+export const audioManager = new AudioManager();
 
 export const useQuestAudio = () => {
-  const [ready, setReady] = useState(audioPreloader.isReady());
+  const [ready, setReady] = useState(audioManager.isReady());
 
   useEffect(() => {
     if (ready) return;
 
-    audioPreloader.preloadAll().then(() => {
+    audioManager.preloadAll().then(() => {
       setReady(true);
     });
   }, [ready]);
 
   const play = (name: SoundName) => {
-    if (!ready) {
-      console.warn('[Audio] Звуки ещё не загружены');
+    if (!audioManager.isReady()) {
+      console.warn('[Audio] Sounds are not ready yet');
       return;
     }
 
-    audioPreloader.play(name);
+    audioManager.play(name);
+  };
+
+  const stop = (name: SoundName) => {
+    audioManager.stop(name);
+  };
+
+  const stopAll = () => {
+    audioManager.stopAll();
   };
 
   const unlock = async () => {
-    await audioPreloader.unlock();
+    await audioManager.unlock();
   };
 
-  return { play, ready, unlock };
+  const setVolume = (name: SoundName, volume: number) => {
+    audioManager.setVolume(name, volume);
+  };
+
+  return {
+    ready,
+    play,
+    stop,
+    stopAll,
+    unlock,
+    setVolume,
+  };
 };
