@@ -87,7 +87,7 @@ export const CarouselStepCard = ({
                   <img
                     src={src}
                     alt={`memory-slide-${index + 1}`}
-                    className="h-[360px] w-full object-cover"
+                    className="h-90 w-full object-cover"
                   />
                 </div>
                 {description && (

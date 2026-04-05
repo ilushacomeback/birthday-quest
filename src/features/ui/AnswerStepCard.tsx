@@ -90,7 +90,7 @@ export function AnswerStepCard({
                   autoCapitalize="none"
                   autoCorrect="off"
                   spellCheck={false}
-                  className="w-full h-[58px] rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-white outline-none placeholder:text-zinc-500 focus:border-green-400/40"
+                  className="w-full h-14.5 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-white outline-none placeholder:text-zinc-500 focus:border-green-400/40"
                 />
 
                 {hint && (
@@ -100,7 +100,7 @@ export function AnswerStepCard({
                       aria-label="Показать подсказку"
                       aria-expanded={isHintOpen}
                       onClick={() => setIsHintOpen((prev) => !prev)}
-                      className="flex h-[58px] w-[58px] items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-zinc-300 transition hover:bg-white/10 active:scale-[0.98]"
+                      className="flex h-14.5 w-14.5 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-zinc-300 transition hover:bg-white/10 active:scale-[0.98]"
                     >
                       <HiOutlineLightBulb size={26} />
                     </button>
