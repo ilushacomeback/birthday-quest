@@ -41,12 +41,27 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
     buttons: [
       {
         label: 'Нет',
-        nextStepId: INITIAL_STEP_ID,
+        nextStepId: 'joke',
         sound: 'error',
         variant: 'error',
       },
       {
         label: 'Да',
+        nextStepId: 'beer-question',
+        sound: 'click',
+        variant: 'default',
+      },
+    ],
+  },
+
+  joke: {
+    id: 'joke',
+    type: 'default',
+    noBackBtn: true,
+    lines: ['Хм, не ожидал от тебя такого.', 'Теперь у тебя не будет выбора.'],
+    buttons: [
+      {
+        label: 'Начать путешествие',
         nextStepId: 'beer-question',
         sound: 'click',
         variant: 'default',

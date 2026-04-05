@@ -72,11 +72,11 @@ export const CarouselStepCard = ({
   return (
     <ScreenCard text="memory_session_active" handleBack={pathToPhotosFromStartPage ? () => handleBack('completed') : handleBack}>
       <div className="space-y-4">
-        <div className="overflow-hidden rounded-[24px]" ref={emblaRef}>
+        <div className="overflow-hidden rounded-3xl" ref={emblaRef}>
           <div className="flex">
             {images.map(({ src, description }, index) => (
               <div key={src} className="min-w-0 shrink-0 grow-0 basis-full">
-                <div className="overflow-hidden rounded-[24px] border border-white/10 bg-white/5">
+                <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5">
                   <img
                     src={src}
                     alt={`memory-slide-${index + 1}`}

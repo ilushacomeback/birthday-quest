@@ -29,6 +29,8 @@ export function DefaultStepCard({
   const [showMainText, setShowMainText] = useState(!loadingLines?.length);
   const [showButtons, setShowButtons] = useState(!lines.length);
 
+  console.log('showButtons', lines, showButtons);
+
   return (
     <ScreenCard
       text="memory_session_active"
@@ -45,7 +47,10 @@ export function DefaultStepCard({
       {showMainText && (
         <DefaultLines
           lines={lines}
-          onComplete={() => setShowButtons(true)}
+          onComplete={() => {
+            console.log('complete');
+            setShowButtons(true);
+          }}
           onSound={onSound}
         />
       )}

@@ -22,14 +22,15 @@ export type QuestStepId =
   | 'carpet-question'
   | 'final'
   | 'completed'
-  | 'secret';
+  | 'secret'
+  | 'joke';
 
 export type QuestButtonVariant = 'default' | 'error';
 
 export type TQuestButton = {
   label: string;
   sound?: SoundName;
-  nextStepId: QuestStepId
+  nextStepId: QuestStepId;
   variant?: QuestButtonVariant;
 };
 
@@ -38,6 +39,7 @@ export type BaseStep = {
   lines: string[];
   loadingLines?: string[];
   prevStepId?: QuestStepId;
+  noBackBtn?: boolean
 };
 
 export type DefaultStep = BaseStep & {

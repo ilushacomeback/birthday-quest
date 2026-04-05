@@ -122,26 +122,30 @@ export function QuestPage() {
 
     if (button.variant === 'error') {
       handleError(true);
+      window.setTimeout(() => onStepChanged(button.nextStepId), 600);
       return;
     }
 
     onStepChanged(button.nextStepId);
   };
 
-  const handleBack = (prevStepId?: QuestStepId) => {
-    if (prevStepId) {
-      onStepChanged(prevStepId);
-      return;
-    }
-    if ('prevStepId' in currentStep && currentStep.prevStepId) {
-      onStepChanged(currentStep.prevStepId);
-      return;
-    }
-    if (currentStep.id === 'intro') {
-      onReplayStarted();
-      return;
-    }
-  };
+  const handleBack =
+    'noBackBtn' in currentStep && currentStep.noBackBtn
+      ? undefined
+      : (prevStepId?: QuestStepId) => {
+          if (prevStepId) {
+            onStepChanged(prevStepId);
+            return;
+          }
+          if ('prevStepId' in currentStep && currentStep.prevStepId) {
+            onStepChanged(currentStep.prevStepId);
+            return;
+          }
+          if (currentStep.id === 'intro') {
+            onReplayStarted();
+            return;
+          }
+        };
 
   const handleAnswerSubmit = async () => {
     if (currentStep.type !== 'answer') return;
@@ -205,6 +209,7 @@ export function QuestPage() {
 
             {started && currentStep.type === 'default' && (
               <DefaultStepCard
+                key={currentStep.id}
                 lines={currentStep.lines}
                 loadingLines={currentStep.loadingLines}
                 buttons={currentStep.buttons}
@@ -217,6 +222,7 @@ export function QuestPage() {
 
             {started && currentStep.type === 'answer' && (
               <AnswerStepCard
+                key={currentStep.id}
                 lines={currentStep.lines}
                 hint={currentStep.hint}
                 value={currentAnswer}
@@ -234,12 +240,15 @@ export function QuestPage() {
                 images={currentStep.images}
                 buttons={currentStep.buttons}
                 onButtonClick={handleDefaultButtonClick}
-                handleBack={handleBack}
+                handleBack={() => handleBack?.()}
               />
             )}
 
             {currentStep.type === 'secret' && (
-              <ScreenCard text="session_complete" handleBack={() => handleBack('completed')}>
+              <ScreenCard
+                text="session_complete"
+                handleBack={() => handleBack?.('completed')}
+              >
                 <div className="space-y-2 text-zinc-100">
                   {currentStep.lines.map((line, index) => (
                     <div
