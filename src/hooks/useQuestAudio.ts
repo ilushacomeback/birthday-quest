@@ -50,7 +50,6 @@ class AudioManager {
     engine: {
       src: engine,
       volume: 0.7,
-      loop: true,
       minIntervalMs: 120,
     },
     electro: {
