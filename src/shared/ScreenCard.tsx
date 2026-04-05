@@ -1,11 +1,16 @@
 import type { PropsWithChildren } from 'react';
 import clsx from 'clsx';
 import { motion } from 'motion/react';
+import { BackButton } from '../features/ui/BackButton';
+import type { QuestStepId } from '../features/config/types';
 
 type ScreenCardProps = PropsWithChildren<{
   className?: string;
   text: string;
   isError?: boolean;
+  handleBack?: (prevStepId?: QuestStepId) => void;
+  backVariant?: 'icon' | 'text';
+  showButtonBack?: boolean
 }>;
 
 export function ScreenCard({
@@ -13,6 +18,9 @@ export function ScreenCard({
   className,
   text,
   isError = false,
+  handleBack,
+  backVariant = 'icon',
+  showButtonBack = true
 }: ScreenCardProps) {
   return (
     <motion.div
@@ -25,22 +33,30 @@ export function ScreenCard({
       }
       transition={{ duration: 0.38, ease: 'easeOut' }}
       className={clsx(
-        'glow w-full rounded-[28px] border bg-black/40 p-5 backdrop-blur-xl transition-colors',
+        'relative glow w-full rounded-[28px] border bg-black/40 p-5 backdrop-blur-xl transition-colors',
         isError ? 'border-red-400/40' : 'border-white/10',
         className,
       )}
     >
       <div className="space-y-5">
-        <div
-          className={[
-            'rounded-2xl border px-4 py-3 text-sm transition-colors',
-            isError
-              ? 'border-red-400/20 bg-red-400/5 text-red-300'
-              : 'border-green-400/20 bg-green-400/5 text-green-300',
-          ].join(' ')}
-        >
-          birthday-quest://{text}
+        <div className='flex gap-3 items-center'>
+          {showButtonBack && handleBack && (
+            <div>
+              <BackButton handleBack={handleBack} variant={backVariant} />
+            </div>
+          )}
+          <div
+            className={[
+              'rounded-2xl border px-4 py-3 text-sm transition-colors text-center',
+              isError
+                ? 'border-red-400/20 bg-red-400/5 text-red-300'
+                : 'border-green-400/20 bg-green-400/5 text-green-300',
+            ].join(' ')}
+          >
+            birthday-quest://{text}
+          </div>
         </div>
+
         {children}
       </div>
     </motion.div>

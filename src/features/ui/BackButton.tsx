@@ -1,22 +1,26 @@
 import { QuestButton } from '../../shared/QuestButton';
-import type { TQuestButton } from '../config/types';
+import clsx from 'clsx';
+
+type BackButtonProps = {
+  handleBack: () => void;
+  variant?: 'icon' | 'text';
+};
 
 export const BackButton = ({
-  onButtonClick,
-}: {
-  onButtonClick: (button: TQuestButton) => void;
-}) => {
+  handleBack,
+  variant = 'icon',
+}: BackButtonProps) => {
+  const isIcon = variant === 'icon';
+
   return (
     <QuestButton
-      onClick={() =>
-        onButtonClick({
-          label: 'Вернуться',
-          nextStepId: 'completed',
-          sound: 'click'
-        })
-      }
+      onClick={() => handleBack()}
+      className={clsx(
+        'text-sm flex items-center justify-center',
+        isIcon ? 'px-4 py-3 h-full' : 'px-3 py-1.5',
+      )}
     >
-      Вернуться
+      {isIcon ? <span className="text-lg leading-none">←</span> : 'Вернуться'}
     </QuestButton>
   );
 };

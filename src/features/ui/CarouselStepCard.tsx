@@ -5,19 +5,20 @@ import { ScreenCard } from '../../shared/ScreenCard';
 import { QuestButton } from '../../shared/QuestButton';
 import { useUnit } from 'effector-react';
 import { $pathToPhotosFromStartPage } from '../../model/quest';
-import type { CarouselStep, TQuestButton } from '../config/types';
-import { BackButton } from './BackButton';
+import type { CarouselStep, QuestStepId, TQuestButton } from '../config/types';
 
 type CarouselStepCardProps = {
   images: CarouselStep['images'];
   buttons: TQuestButton[];
   onButtonClick: (button: TQuestButton) => void;
+  handleBack: (prevStepId?: QuestStepId) => void
 };
 
 export const CarouselStepCard = ({
   images,
   buttons,
   onButtonClick,
+  handleBack
 }: CarouselStepCardProps) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
@@ -69,7 +70,7 @@ export const CarouselStepCard = ({
   console.log('pathToPhotosFromStartPage', pathToPhotosFromStartPage);
 
   return (
-    <ScreenCard text="memory_session_active">
+    <ScreenCard text="memory_session_active" handleBack={pathToPhotosFromStartPage ? () => handleBack('completed') : handleBack}>
       <div className="space-y-4">
         <div className="overflow-hidden rounded-[24px]" ref={emblaRef}>
           <div className="flex">
@@ -110,9 +111,6 @@ export const CarouselStepCard = ({
             Дальше
           </button>
         </div>
-        {pathToPhotosFromStartPage && (
-          <BackButton onButtonClick={onButtonClick} />
-        )}
       </div>
 
       <AnimatePresence>

@@ -62,9 +62,17 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
       'Без чего не обходится ни одно путешествие?',
     ],
     hint: 'Это путешествие в светлое прошлое, а что ещё бывает светлым?',
-    acceptedAnswers: ['пиво'],
+    acceptedAnswers: [
+      'пиво',
+      'без пива',
+      'пивасик',
+      'без пивасика',
+      'белый медведь',
+      'без белого медведя',
+    ],
     submitLabel: 'Ответить',
     nextStepId: 'beer-found',
+    prevStepId: INITIAL_STEP_ID,
     successSound: 'success',
     errorSound: 'error',
   },
@@ -72,6 +80,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
   'beer-found': {
     id: 'beer-found',
     type: 'default',
+    prevStepId: 'beer-question',
     lines: [
       'Вот он, настоящий мужчина.',
       'Диагностика показала: 100% свой человек.',
@@ -91,6 +100,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
   'car-question': {
     id: 'car-question',
     type: 'answer',
+    prevStepId: 'beer-found',
     nextStepId: 'car-found',
     lines: [
       'Не торопись, мой дорогой друг.',
@@ -98,7 +108,18 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
       'Смотрю после одной бутылки ты всё ещё держишься, но куда бы ты точно не сел в таком состоянии?',
     ],
     hint: 'Куда нельзя садиться в пьяном состоянии?',
-    acceptedAnswers: ['машина', 'автомобиль', 'авто'],
+    acceptedAnswers: [
+      'машина',
+      'в машину',
+      'автомобиль',
+      'в автомобиль',
+      'авто',
+      'в авто',
+      'четырка',
+      'в четырку',
+      'чепырка',
+      'в чепырку',
+    ],
     submitLabel: 'Ответить',
     successSound: 'success',
     errorSound: 'error',
@@ -107,8 +128,9 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
   'car-found': {
     id: 'car-found',
     type: 'default',
+    prevStepId: 'car-question',
     lines: [
-      'Молодец! Но в нашем путешествии можно всё, так что иди к __LOCATION_CAR__ и заводи малышку.',
+      'Молодец! Но в нашем путешествии можно всё, так что иди в гараж (шкаф, верхняя полка) и заводи малышку.',
     ],
     buttons: [
       {
@@ -123,14 +145,24 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
   'debt-question': {
     id: 'debt-question',
     type: 'answer',
+    prevStepId: 'car-found',
     lines: [
       'Ох, что-то не заводится... Наверное бензина нет.',
       'Надо заправиться, но где же взять деньги?',
       'Точно, а помнишь одного друга, который несколько лет не мог вернуть небольшой долг?',
       'Напомни-ка, сколько рублей он был тебе должен?',
     ],
-    acceptedAnswers: ['200', '200р', '200 руб', '200 рублей'],
+    acceptedAnswers: [
+      '200',
+      '200р',
+      '200 р',
+      '200 руб',
+      '200 рублей',
+      'двести',
+      'двести рублей',
+    ],
     submitLabel: 'Ответить',
+    hint: 'Неужели забыл?... Начинается с 2..',
     nextStepId: 'debt-found',
     successSound: 'success',
     errorSound: 'error',
@@ -139,6 +171,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
   'debt-found': {
     id: 'debt-found',
     type: 'default',
+    prevStepId: 'debt-question',
     lines: [
       'Отлично, нам как раз хватит чутка подзаправиться!',
       'Да-да, он же тебе вернул их..., но ничего страшного, подойди к нему и скажи, что накапали проценты.',
@@ -156,6 +189,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
   'engine-start': {
     id: 'engine-start',
     type: 'default',
+    prevStepId: 'debt-found',
     lines: [
       'Уух, с пол тычка заревела.',
       'К Кулибину бы на покраску её и вообще шикардосик был бы.',
@@ -174,6 +208,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
   memories: {
     id: 'memories',
     type: 'carousel',
+    prevStepId: 'engine-start',
     images: [
       {
         src: see,
@@ -185,7 +220,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
       },
       {
         src: call,
-        description: 'Не геи *Алина просто что ты обрезалась((',
+        description: 'Не геи *Алина прости что ты обрезалась :(',
       },
       {
         src: fuck,
@@ -248,7 +283,6 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
         description: 'Стоим с Зойкой',
       },
     ],
-    captions: ['Светлое прошлое во всей красе'],
     buttons: [
       {
         label: 'Дальше',
@@ -261,6 +295,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
 
   'carpet-question': {
     id: 'carpet-question',
+    prevStepId: 'memories',
     type: 'answer',
     lines: [
       'Ну что, вот мы и чутка окунулись в светлое прошлое.',
@@ -269,7 +304,8 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
       'Ах, чуть не забыл, помнишь ту ситуацию с кальяном?',
       'Кажется тебе что-то прожгли, напомнишь?',
     ],
-    acceptedAnswers: ['ковер', 'ковёр'],
+    hint: 'Что-то длинное, на полу лежит обычно, раньше еще на стены вешали',
+    acceptedAnswers: ['ковер', 'кавер', 'ковёр', 'коврик', 'палас'],
     submitLabel: 'Ответить',
     nextStepId: 'final',
     successSound: 'success',
@@ -279,8 +315,9 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
   final: {
     id: 'final',
     type: 'default',
+    prevStepId: 'carpet-question',
     lines: [
-      'Точно, супер! Загляни-ка в __LOCATION_CARPET__, там тебя ждёт новенький ковёр.',
+      'Точно, супер! Загляни-ка в стиральную машинку, там тебя ждёт новенький ковёр.',
       'Не совсем тот, который был, но и этот вроде неплох.',
       'А мне уже пора, дорогой друг.',
       'Удачи тебе во всём и чтобы перед тобой все двери были открыты, а ноги раздвинуты!',

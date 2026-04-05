@@ -7,12 +7,11 @@ import { CarouselStepCard } from '../features/ui/CarouselStepCard';
 import { StartScreen } from '../features/ui/StartScreen';
 import { CompletedScreen } from '../features/ui/CompletedScreen';
 import { ScreenCard } from '../shared/ScreenCard';
-import type { TQuestButton } from '../features/config/types';
+import type { QuestStepId, TQuestButton } from '../features/config/types';
 import { INITIAL_STEP_ID } from '../features/config/constants';
 import { Loader } from '../shared/Loader';
-import { BackButton } from '../features/ui/BackButton';
 import {
-  $completedOnce,
+  // $completedOnce,
   $currentAnswer,
   $currentStep,
   $finished,
@@ -34,7 +33,7 @@ export function QuestPage() {
   const currentAnswer = useUnit($currentAnswer);
   const started = useUnit($started);
   const finished = useUnit($finished);
-  const completedOnce = useUnit($completedOnce);
+  // const completedOnce = useUnit($completedOnce);
   const init = useUnit($init);
 
   const onAppStarted = useUnit(appStarted);
@@ -64,37 +63,29 @@ export function QuestPage() {
   const handleStart = async () => {
     await unlock();
     play('electro');
-    window.setTimeout(() => {
-      onQuestStarted();
-      onStepChanged(INITIAL_STEP_ID);
-    }, 100);
+    onQuestStarted();
+    onStepChanged(INITIAL_STEP_ID);
   };
 
   const handleReplay = async () => {
     await unlock();
     play('electro');
-    window.setTimeout(() => {
-      onReplayStarted();
-      onQuestStarted();
-      onStepChanged(INITIAL_STEP_ID);
-    }, 100);
+    onReplayStarted();
+    onQuestStarted();
+    onStepChanged(INITIAL_STEP_ID);
   };
 
   const handleGoToPhotos = async () => {
     await unlock();
     play('click');
-    window.setTimeout(() => {
-      onStepChanged('memories');
-      onTogglePathToPhotosFromStartPage(true);
-    }, 100);
+    onStepChanged('memories');
+    onTogglePathToPhotosFromStartPage(true);
   };
 
   const handleSecret = async () => {
     await unlock();
     play('click');
-    window.setTimeout(() => {
-      onStepChanged('secret');
-    }, 100);
+    onStepChanged('secret');
   };
 
   const soundTypewriter = useCallback(async () => {
@@ -126,7 +117,7 @@ export function QuestPage() {
     }
 
     const soundName = button.sound ?? 'click';
-    await unlock()
+    await unlock();
     play(soundName);
 
     if (button.variant === 'error') {
@@ -134,7 +125,22 @@ export function QuestPage() {
       return;
     }
 
-    window.setTimeout(() => onStepChanged(button.nextStepId), 100);
+    onStepChanged(button.nextStepId);
+  };
+
+  const handleBack = (prevStepId?: QuestStepId) => {
+    if (prevStepId) {
+      onStepChanged(prevStepId);
+      return;
+    }
+    if ('prevStepId' in currentStep && currentStep.prevStepId) {
+      onStepChanged(currentStep.prevStepId);
+      return;
+    }
+    if (currentStep.id === 'intro') {
+      onReplayStarted();
+      return;
+    }
   };
 
   const handleAnswerSubmit = async () => {
@@ -149,7 +155,7 @@ export function QuestPage() {
       const errorSound = currentStep.errorSound ?? 'error';
 
       if (errorSound === 'error') {
-        await unlock()
+        await unlock();
         play('error');
       }
 
@@ -163,11 +169,11 @@ export function QuestPage() {
     const successSound = currentStep.successSound ?? 'success';
 
     if (successSound === 'success') {
-      await unlock()
+      await unlock();
       play('success');
     }
 
-    window.setTimeout(() => onAnswerSubmitted(), 100);
+    onAnswerSubmitted();
   };
 
   if (!init || !ready) return <Loader />;
@@ -179,19 +185,17 @@ export function QuestPage() {
       <div className="w-full">
         <StepTransition
           stepKey={
-            !started && !completedOnce
+            !started
               ? 'start-screen'
-              : finished && completedOnce
+              : finished
                 ? 'completed-hub'
                 : currentStep.id
           }
         >
           <>
-            {!started && !completedOnce && (
-              <StartScreen onStart={handleStart} />
-            )}
+            {!started && !finished && <StartScreen onStart={handleStart} />}
 
-            {finished && completedOnce && (
+            {finished && !started && (
               <CompletedScreen
                 onReplay={handleReplay}
                 onGoToPhotos={handleGoToPhotos}
@@ -207,6 +211,7 @@ export function QuestPage() {
                 onButtonClick={handleDefaultButtonClick}
                 onSound={soundTypewriter}
                 isError={isAnswerError}
+                handleBack={handleBack}
               />
             )}
 
@@ -220,19 +225,21 @@ export function QuestPage() {
                 onSubmit={handleAnswerSubmit}
                 onSound={soundTypewriter}
                 isError={isAnswerError}
+                handleBack={handleBack}
               />
             )}
 
-            {started && currentStep.type === 'carousel' && (
+            {currentStep.type === 'carousel' && (
               <CarouselStepCard
                 images={currentStep.images}
                 buttons={currentStep.buttons}
                 onButtonClick={handleDefaultButtonClick}
+                handleBack={handleBack}
               />
             )}
 
-            {started && currentStep.type === 'secret' && (
-              <ScreenCard text="session_complete">
+            {currentStep.type === 'secret' && (
+              <ScreenCard text="session_complete" handleBack={() => handleBack('completed')}>
                 <div className="space-y-2 text-zinc-100">
                   {currentStep.lines.map((line, index) => (
                     <div
@@ -243,7 +250,6 @@ export function QuestPage() {
                     </div>
                   ))}
                 </div>
-                <BackButton onButtonClick={handleDefaultButtonClick} />
               </ScreenCard>
             )}
           </>

@@ -12,6 +12,7 @@ type DefaultStepCardProps = {
   loadingLines?: string[];
   buttons: TQuestButton[];
   onButtonClick: (button: TQuestButton) => void;
+  handleBack?: () => void;
   onSound: TypewriterLinesProps['onSound'];
   isError?: boolean;
 };
@@ -23,12 +24,17 @@ export function DefaultStepCard({
   onButtonClick,
   onSound,
   isError,
+  handleBack,
 }: DefaultStepCardProps) {
   const [showMainText, setShowMainText] = useState(!loadingLines?.length);
   const [showButtons, setShowButtons] = useState(!lines.length);
 
   return (
-    <ScreenCard text="memory_session_active" isError={isError}>
+    <ScreenCard
+      text="memory_session_active"
+      isError={isError}
+      handleBack={handleBack}
+    >
       {loadingLines && (
         <LoadingLines
           lines={loadingLines}

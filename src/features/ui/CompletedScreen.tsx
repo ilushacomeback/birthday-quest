@@ -13,7 +13,7 @@ export const CompletedScreen = ({
   onSecret,
 }: CompletedHubScreenProps) => {
   return (
-    <ScreenCard text='scan_completed'>
+    <ScreenCard text='scan_completed' showButtonBack={false}>
       <div className="space-y-2">
         <div className="text-2xl font-semibold text-white">
           Сканирование уже проводилось

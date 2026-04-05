@@ -1,28 +1,24 @@
 import { createEvent, createStore, sample } from 'effector';
 import { questStepsMap } from '../features/config/steps';
-import type { QuestStepId } from '../features/config/types';
+import type { QuestStepId, TQuestButton } from '../features/config/types';
 import { INITIAL_STEP_ID, STORAGE_KEY } from '../features/config/constants';
-
-
 
 type QuestState = {
   currentStepId: QuestStepId;
+  prevStepId: QuestStepId | null;
   answers: Partial<Record<QuestStepId, string>>;
   started: boolean;
   finished: boolean;
-  completedOnce: boolean;
   init: boolean;
   pathToPhotosFromStartPage: boolean;
 };
 
-
-
 const defaultState: QuestState = {
   currentStepId: INITIAL_STEP_ID,
+  prevStepId: null,
   answers: {},
   started: false,
   finished: false,
-  completedOnce: false,
   init: false,
   pathToPhotosFromStartPage: false,
 };
@@ -47,16 +43,20 @@ const loadState = (): QuestState => {
 
     const parsed = JSON.parse(raw) as Partial<QuestState>;
     const currentStepId = parsed.currentStepId;
+    const prevStepId = parsed.prevStepId;
 
     return {
       currentStepId:
         typeof currentStepId === 'string' && isQuestStepId(currentStepId)
           ? currentStepId
           : INITIAL_STEP_ID,
+      prevStepId:
+        typeof prevStepId === 'string' && isQuestStepId(prevStepId)
+          ? prevStepId
+          : null,
       answers: parsed.answers ?? {},
       started: parsed.started ?? false,
       finished: parsed.finished ?? false,
-      completedOnce: parsed.completedOnce ?? false,
       pathToPhotosFromStartPage: parsed.pathToPhotosFromStartPage ?? false,
       init: true,
     };
@@ -75,7 +75,7 @@ const persistState = (state: QuestState) => {
 
 export const appStarted = createEvent();
 export const questStarted = createEvent();
-export const stepChanged = createEvent<QuestStepId>();
+export const stepChanged = createEvent<TQuestButton['nextStepId']>();
 export const answerChanged = createEvent<string>();
 export const answerSubmitted = createEvent();
 export const questReset = createEvent();
@@ -91,18 +91,20 @@ export const $quest = createStore<QuestState>(defaultState)
     return nextState;
   })
   .on(stepChanged, (state, nextStepId) => {
-    const isFinished = nextStepId === 'completed';
+    const currentStepId = nextStepId;
 
-    console.log('state', state);
+    const isFinished = currentStepId === 'completed';
 
     const nextState = {
       ...state,
-      currentStepId: nextStepId,
-      started: true,
-      finished: isFinished,
-      completedOnce: state.completedOnce || isFinished,
+      prevStepId: state.currentStepId,
+      currentStepId: currentStepId,
+      started: !isFinished,
+      finished: isFinished ? true : state.finished,
       pathToPhotosFromStartPage: false,
     };
+
+    console.log('state', nextState);
 
     persistState(nextState);
     return nextState;
@@ -136,7 +138,6 @@ export const $quest = createStore<QuestState>(defaultState)
       currentStepId: INITIAL_STEP_ID,
       answers: {},
       started: false,
-      finished: false,
     };
 
     persistState(nextState);
@@ -146,6 +147,9 @@ export const $quest = createStore<QuestState>(defaultState)
 export const $currentStep = $quest.map(
   (state) => questStepsMap[state.currentStepId],
 );
+export const $prevStep = $quest.map(
+  (state) => state.prevStepId && questStepsMap[state.prevStepId],
+);
 
 export const $currentAnswer = $quest.map(
   (state) => state.answers[state.currentStepId] ?? '',
@@ -153,9 +157,10 @@ export const $currentAnswer = $quest.map(
 
 export const $started = $quest.map((state) => state.started);
 export const $finished = $quest.map((state) => state.finished);
-export const $completedOnce = $quest.map((state) => state.completedOnce);
 export const $init = $quest.map((state) => state.init);
-export const $pathToPhotosFromStartPage = $quest.map((state) => state.pathToPhotosFromStartPage);
+export const $pathToPhotosFromStartPage = $quest.map(
+  (state) => state.pathToPhotosFromStartPage,
+);
 
 sample({
   clock: answerSubmitted,

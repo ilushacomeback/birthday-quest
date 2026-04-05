@@ -24,12 +24,12 @@ export type QuestStepId =
   | 'completed'
   | 'secret';
 
-export type QuestButtonVariant = 'default' | 'error'
+export type QuestButtonVariant = 'default' | 'error';
 
 export type TQuestButton = {
   label: string;
   sound?: SoundName;
-  nextStepId: QuestStepId;
+  nextStepId: QuestStepId
   variant?: QuestButtonVariant;
 };
 
@@ -37,6 +37,7 @@ export type BaseStep = {
   id: QuestStepId;
   lines: string[];
   loadingLines?: string[];
+  prevStepId?: QuestStepId;
 };
 
 export type DefaultStep = BaseStep & {
@@ -56,15 +57,15 @@ export type AnswerStep = BaseStep & {
 
 type Image = {
   src: string;
-  description?: string
-}
+  description?: string;
+};
 
 export type CarouselStep = {
   id: 'memories';
   type: 'carousel';
   images: Image[];
-  captions: string[];
   buttons: TQuestButton[];
+  prevStepId: QuestStepId;
 };
 
 export type CompletedStep = {
