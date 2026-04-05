@@ -50,7 +50,7 @@ export function ScreenCard({
 
           <div
             className={clsx(
-              'h-14 flex-1 rounded-2xl border px-4',
+              'h-14 min-w-0 flex-1 rounded-2xl border px-4',
               'flex items-center justify-center text-center text-sm leading-none',
               isError
                 ? 'border-red-400/20 bg-red-400/5 text-red-300'
