@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import clsx from 'clsx';
 
 type TypewriterMode = 'append' | 'replace';
@@ -50,6 +56,26 @@ export const TypewriterLines = ({
   const [phase, setPhase] = useState<TypewriterPhase>('typing');
 
   const lastTypeSoundAtRef = useRef(0);
+  const rafIdRef = useRef<number | null>(null);
+  const lastFrameTimeRef = useRef<number | null>(null);
+  const elapsedRef = useRef(0);
+  const completeCalledRef = useRef(false);
+
+  const lineIndexRef = useRef(lineIndex);
+  const charIndexRef = useRef(charIndex);
+  const phaseRef = useRef(phase);
+
+  useEffect(() => {
+    lineIndexRef.current = lineIndex;
+  }, [lineIndex]);
+
+  useEffect(() => {
+    charIndexRef.current = charIndex;
+  }, [charIndex]);
+
+  useEffect(() => {
+    phaseRef.current = phase;
+  }, [phase]);
 
   const tryPlayTypeSound = useCallback(
     (char: string) => {
@@ -68,83 +94,152 @@ export const TypewriterLines = ({
 
   useEffect(() => {
     if (!safeLines.length) {
-      onComplete?.();
+      if (!completeCalledRef.current) {
+        completeCalledRef.current = true;
+        onComplete?.();
+      }
       return;
     }
 
-    if (lineIndex >= safeLines.length) {
-      onComplete?.();
-      return;
-    }
+    const tick = (time: number) => {
+      if (lastFrameTimeRef.current == null) {
+        lastFrameTimeRef.current = time;
+        rafIdRef.current = requestAnimationFrame(tick);
+        return;
+      }
 
-    const currentLine = safeLines[lineIndex] ?? '';
+      const deltaTime = time - lastFrameTimeRef.current;
+      lastFrameTimeRef.current = time;
+      elapsedRef.current += deltaTime;
 
-    if (mode === 'append') {
-      const timeout = window.setTimeout(() => {
-        if (charIndex < currentLine.length) {
-          const nextChar = currentLine[charIndex] ?? '';
-          tryPlayTypeSound(nextChar);
-          setCharIndex((prev) => prev + 1);
+      const currentLineIndex = lineIndexRef.current;
+      const currentPhase = phaseRef.current;
+
+      if (currentLineIndex >= safeLines.length) {
+        if (!completeCalledRef.current) {
+          completeCalledRef.current = true;
+          onComplete?.();
+        }
+        return;
+      }
+
+      if (mode === 'append') {
+        while (elapsedRef.current >= speed) {
+          elapsedRef.current -= speed;
+
+          const latestLineIndex = lineIndexRef.current;
+          const latestCharIndex = charIndexRef.current;
+          const latestLine = safeLines[latestLineIndex] ?? '';
+
+          if (latestLineIndex >= safeLines.length) {
+            if (!completeCalledRef.current) {
+              completeCalledRef.current = true;
+              onComplete?.();
+            }
+            return;
+          }
+
+          if (latestCharIndex < latestLine.length) {
+            const nextChar = latestLine[latestCharIndex] ?? '';
+            tryPlayTypeSound(nextChar);
+            setCharIndex((prev) => prev + 1);
+          } else {
+            setCompletedLines((prev) => [...prev, latestLine]);
+            setLineIndex((prev) => prev + 1);
+            setCharIndex(0);
+          }
+
+          rafIdRef.current = requestAnimationFrame(tick);
           return;
         }
 
-        setCompletedLines((prev) => [...prev, currentLine]);
-        setLineIndex((prev) => prev + 1);
-        setCharIndex(0);
-      }, speed);
+        rafIdRef.current = requestAnimationFrame(tick);
+        return;
+      }
 
-      return () => window.clearTimeout(timeout);
-    }
+      if (currentPhase === 'typing') {
+        while (elapsedRef.current >= speed) {
+          elapsedRef.current -= speed;
 
-    if (phase === 'typing') {
-      const timeout = window.setTimeout(() => {
-        if (charIndex < currentLine.length) {
-          const nextChar = currentLine[charIndex] ?? '';
-          tryPlayTypeSound(nextChar);
-          setCharIndex((prev) => prev + 1);
+          const latestLineIndex = lineIndexRef.current;
+          const latestCharIndex = charIndexRef.current;
+          const latestLine = safeLines[latestLineIndex] ?? '';
+
+          if (latestLineIndex >= safeLines.length) {
+            if (!completeCalledRef.current) {
+              completeCalledRef.current = true;
+              onComplete?.();
+            }
+            return;
+          }
+
+          if (latestCharIndex < latestLine.length) {
+            const nextChar = latestLine[latestCharIndex] ?? '';
+            tryPlayTypeSound(nextChar);
+            setCharIndex((prev) => prev + 1);
+          } else {
+            setPhase('pause');
+          }
+
+          rafIdRef.current = requestAnimationFrame(tick);
           return;
         }
 
-        setPhase('pause');
-      }, speed);
+        rafIdRef.current = requestAnimationFrame(tick);
+        return;
+      }
 
-      return () => window.clearTimeout(timeout);
-    }
-
-    if (phase === 'pause') {
-      const timeout = window.setTimeout(() => {
-        setPhase('erasing');
-      }, pauseBeforeErase);
-
-      return () => window.clearTimeout(timeout);
-    }
-
-    if (phase === 'erasing') {
-      const timeout = window.setTimeout(() => {
-        if (charIndex > 0) {
-          setCharIndex((prev) => prev - 1);
+      if (currentPhase === 'pause') {
+        if (elapsedRef.current >= pauseBeforeErase) {
+          elapsedRef.current -= pauseBeforeErase;
+          setPhase('erasing');
+          rafIdRef.current = requestAnimationFrame(tick);
           return;
         }
 
-        setLineIndex((prev) => prev + 1);
-        setCharIndex(0);
-        setPhase('typing');
-      }, eraseSpeed);
+        rafIdRef.current = requestAnimationFrame(tick);
+        return;
+      }
 
-      return () => window.clearTimeout(timeout);
-    }
+      if (currentPhase === 'erasing') {
+        while (elapsedRef.current >= eraseSpeed) {
+          elapsedRef.current -= eraseSpeed;
+
+          const latestCharIndex = charIndexRef.current;
+
+          if (latestCharIndex > 0) {
+            setCharIndex((prev) => prev - 1);
+          } else {
+            setLineIndex((prev) => prev + 1);
+            setCharIndex(0);
+            setPhase('typing');
+          }
+
+          rafIdRef.current = requestAnimationFrame(tick);
+          return;
+        }
+
+        rafIdRef.current = requestAnimationFrame(tick);
+      }
+    };
+
+    rafIdRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      if (rafIdRef.current != null) {
+        cancelAnimationFrame(rafIdRef.current);
+      }
+      rafIdRef.current = null;
+      lastFrameTimeRef.current = null;
+      elapsedRef.current = 0;
+    };
   }, [
     safeLines,
-    lineIndex,
-    charIndex,
     speed,
     eraseSpeed,
     pauseBeforeErase,
     onComplete,
     mode,
-    phase,
-    onSound,
-    typeSoundIntervalMs,
     tryPlayTypeSound,
   ]);
 
@@ -196,7 +291,7 @@ export const TypewriterLines = ({
           {showCursor && (
             <span
               className={clsx(
-                'typewriter-cursor ml-1 inline-block h-4 w-1 translate-y-[0px] rounded-sm align-middle',
+                'typewriter-cursor ml-1 inline-block h-4 w-1 translate-y-0 rounded-sm align-middle',
                 currentCursorColorClassName,
               )}
               style={
