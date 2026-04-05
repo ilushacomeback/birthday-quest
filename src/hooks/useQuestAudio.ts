@@ -13,15 +13,50 @@ class AudioPreloader {
   private ready = false;
   private poolSize = 2;
 
+  private audioContext: AudioContext | null = null;
+  private typewriterBuffer: AudioBuffer | null = null;
+  private typewriterGain: GainNode | null = null;
+  private typewriterLastPlayAt = 0;
+  private typewriterMinIntervalMs = 90;
+  private unlocked = false;
+
+  private getAudioContext() {
+    if (this.audioContext) return this.audioContext;
+
+    const AudioContextCtor =
+      window.AudioContext ||
+      (window as typeof window & { webkitAudioContext?: typeof AudioContext })
+        .webkitAudioContext;
+
+    if (!AudioContextCtor) return null;
+
+    this.audioContext = new AudioContextCtor();
+    this.typewriterGain = this.audioContext.createGain();
+    this.typewriterGain.gain.value = 0.35;
+    this.typewriterGain.connect(this.audioContext.destination);
+
+    return this.audioContext;
+  }
+
+  async unlock() {
+    const ctx = this.getAudioContext();
+    if (!ctx || this.unlocked) return;
+
+    if (ctx.state !== 'running') {
+      await ctx.resume();
+    }
+
+    this.unlocked = true;
+  }
+
   async preloadAll() {
-    const items: { name: SoundName; src: string }[] = [
+    const items: { name: Exclude<SoundName, 'typewriter'>; src: string }[] = [
       { name: 'click', src: click },
       { name: 'success', src: success },
       { name: 'error', src: error },
       { name: 'engine', src: engine },
       { name: 'electro', src: electro },
       { name: 'failedEngine', src: failedEngine },
-      { name: 'typewriter', src: typewriter },
     ];
 
     const loadPromises: Promise<void>[] = [];
@@ -37,12 +72,16 @@ class AudioPreloader {
         const loadPromise = new Promise<void>((resolve) => {
           if (audio.readyState >= 2) {
             resolve();
-          } else {
-            audio.addEventListener('canplaythrough', () => resolve(), {
-              once: true,
-            });
-            audio.load();
+            return;
           }
+
+          const done = () => resolve();
+
+          audio.addEventListener('canplaythrough', done, { once: true });
+          audio.addEventListener('loadeddata', done, { once: true });
+          audio.addEventListener('error', done, { once: true });
+
+          audio.load();
         });
 
         loadPromises.push(loadPromise);
@@ -52,12 +91,28 @@ class AudioPreloader {
       this.sounds.set(name, pool);
     }
 
-    await Promise.all(loadPromises);
+    const ctx = this.getAudioContext();
+
+    const typewriterPromise = (async () => {
+      if (!ctx) return;
+
+      const response = await fetch(typewriter);
+      const arrayBuffer = await response.arrayBuffer();
+      this.typewriterBuffer = await ctx.decodeAudioData(arrayBuffer);
+    })();
+
+    await Promise.all([...loadPromises, typewriterPromise]);
+
     this.ready = true;
     console.log('[Audio] Все звуки предзагружены');
   }
 
   play(name: SoundName) {
+    if (name === 'typewriter') {
+      this.playTypewriter();
+      return;
+    }
+
     const pool = this.sounds.get(name);
     if (!pool) {
       console.warn(`[Audio] Звук ${name} не найден`);
@@ -72,13 +127,39 @@ class AudioPreloader {
       audio.currentTime = 0;
     }
 
-    audio.volume = name === 'typewriter' ? 0.4 : 0.9;
+    audio.volume = 0.9;
     audio.currentTime = 0;
 
     const playPromise = audio.play();
     if (playPromise !== undefined) {
       playPromise.catch((e) => console.log(`[Audio] Play ${name} error:`, e));
     }
+  }
+
+  private playTypewriter() {
+    const now = performance.now();
+
+    if (now - this.typewriterLastPlayAt < this.typewriterMinIntervalMs) {
+      return;
+    }
+
+    const ctx = this.getAudioContext();
+
+    if (
+      !ctx ||
+      !this.typewriterBuffer ||
+      !this.typewriterGain ||
+      !this.unlocked
+    ) {
+      return;
+    }
+
+    const source = ctx.createBufferSource();
+    source.buffer = this.typewriterBuffer;
+    source.connect(this.typewriterGain);
+    source.start(0);
+
+    this.typewriterLastPlayAt = now;
   }
 
   isReady() {
@@ -92,9 +173,7 @@ export const useQuestAudio = () => {
   const [ready, setReady] = useState(audioPreloader.isReady());
 
   useEffect(() => {
-    if (ready) {
-      return;
-    }
+    if (ready) return;
 
     audioPreloader.preloadAll().then(() => {
       setReady(true);
@@ -106,8 +185,13 @@ export const useQuestAudio = () => {
       console.warn('[Audio] Звуки ещё не загружены');
       return;
     }
+
     audioPreloader.play(name);
   };
 
-  return { play, ready };
+  const unlock = async () => {
+    await audioPreloader.unlock();
+  };
+
+  return { play, ready, unlock };
 };

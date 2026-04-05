@@ -47,7 +47,7 @@ export function QuestPage() {
     togglePathToPhotosFromStartPage,
   );
 
-  const { play, ready } = useQuestAudio();
+  const { play, ready, unlock } = useQuestAudio();
 
   useEffect(() => {
     onAppStarted();
@@ -61,7 +61,8 @@ export function QuestPage() {
       .replace(/[.,!?;:;"'`()-]/g, '')
       .replace(/\s+/g, ' ');
 
-  const handleStart = () => {
+  const handleStart = async () => {
+    await unlock();
     play('electro');
     window.setTimeout(() => {
       onQuestStarted();
@@ -69,7 +70,8 @@ export function QuestPage() {
     }, 100);
   };
 
-  const handleReplay = () => {
+  const handleReplay = async () => {
+    await unlock();
     play('electro');
     window.setTimeout(() => {
       onReplayStarted();
@@ -78,7 +80,8 @@ export function QuestPage() {
     }, 100);
   };
 
-  const handleGoToPhotos = () => {
+  const handleGoToPhotos = async () => {
+    await unlock();
     play('click');
     window.setTimeout(() => {
       onStepChanged('memories');
@@ -86,16 +89,18 @@ export function QuestPage() {
     }, 100);
   };
 
-  const handleSecret = () => {
+  const handleSecret = async () => {
+    await unlock();
     play('click');
     window.setTimeout(() => {
       onStepChanged('secret');
     }, 100);
   };
 
-  const soundTypewriter = useCallback(() => {
+  const soundTypewriter = useCallback(async () => {
+    await unlock();
     play('typewriter');
-  }, [play]);
+  }, [play, unlock]);
 
   const handleError = (isError: boolean) => {
     if (isError) {
@@ -111,7 +116,7 @@ export function QuestPage() {
     setIsAnswerError(false);
   };
 
-  const handleDefaultButtonClick = (button: TQuestButton) => {
+  const handleDefaultButtonClick = async (button: TQuestButton) => {
     console.log('change step', button);
 
     handleError(false);
@@ -121,6 +126,7 @@ export function QuestPage() {
     }
 
     const soundName = button.sound ?? 'click';
+    await unlock()
     play(soundName);
 
     if (button.variant === 'error') {
@@ -131,7 +137,7 @@ export function QuestPage() {
     window.setTimeout(() => onStepChanged(button.nextStepId), 100);
   };
 
-  const handleAnswerSubmit = () => {
+  const handleAnswerSubmit = async () => {
     if (currentStep.type !== 'answer') return;
 
     const normalized = normalizeAnswer(currentAnswer);
@@ -143,6 +149,7 @@ export function QuestPage() {
       const errorSound = currentStep.errorSound ?? 'error';
 
       if (errorSound === 'error') {
+        await unlock()
         play('error');
       }
 
@@ -156,6 +163,7 @@ export function QuestPage() {
     const successSound = currentStep.successSound ?? 'success';
 
     if (successSound === 'success') {
+      await unlock()
       play('success');
     }
 
