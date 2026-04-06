@@ -1,20 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { MdFullscreen } from 'react-icons/md';
 
+type HTMLVideoElementWithWebkit = HTMLVideoElement & {
+  webkitEnterFullscreen?: () => void;
+};
+
 type VideoSlideProps = {
   src: string;
   poster?: string;
   isActive: boolean;
-  onOpenFullscreen: () => void;
 };
 
-export const VideoSlide = ({
-  src,
-  poster,
-  isActive,
-  onOpenFullscreen,
-}: VideoSlideProps) => {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+export const VideoSlide = ({ src, poster, isActive }: VideoSlideProps) => {
+  const videoRef = useRef<HTMLVideoElementWithWebkit | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const handleTogglePlay = () => {
@@ -27,6 +25,26 @@ export const VideoSlide = ({
     }
 
     video.pause();
+  };
+
+  const handleOpenNativeFullscreen = async () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    try {
+      await video.play();
+
+      if (typeof video.webkitEnterFullscreen === 'function') {
+        video.webkitEnterFullscreen();
+        return;
+      }
+
+      if (video.requestFullscreen) {
+        await video.requestFullscreen();
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -83,15 +101,7 @@ export const VideoSlide = ({
 
       <button
         type="button"
-        onClick={() => {
-          const video = videoRef.current;
-          if (video) {
-            video.pause();
-            video.currentTime = 0;
-          }
-
-          onOpenFullscreen();
-        }}
+        onClick={handleOpenNativeFullscreen}
         className="absolute right-3 top-3 z-20 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs text-white/80 backdrop-blur"
       >
         <MdFullscreen size={24} />
