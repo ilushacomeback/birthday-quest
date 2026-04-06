@@ -87,7 +87,6 @@ export const $quest = createStore<QuestState>(defaultState)
   .on(questStarted, (state) => {
     const nextState = { ...state, started: true };
     persistState(nextState);
-    console.log('started', nextState);
     return nextState;
   })
   .on(stepChanged, (state, nextStepId) => {
@@ -104,14 +103,10 @@ export const $quest = createStore<QuestState>(defaultState)
       pathToPhotosFromStartPage: false,
     };
 
-    console.log('state', nextState);
-
     persistState(nextState);
     return nextState;
   })
   .on(togglePathToPhotosFromStartPage, (state, pathToPhotosFromStartPage) => {
-    console.log('state', state, pathToPhotosFromStartPage);
-
     const nextState = {
       ...state,
       pathToPhotosFromStartPage,

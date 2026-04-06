@@ -31,8 +31,6 @@ export function DefaultStepCard({
   const [showMainText, setShowMainText] = useState(!loadingLines?.length);
   const [showButtons, setShowButtons] = useState(!lines.length);
 
-  console.log('showButtons', lines, showButtons);
-
   return (
     <ScreenCard
       isError={isError}
@@ -50,7 +48,6 @@ export function DefaultStepCard({
         <DefaultLines
           lines={lines}
           onComplete={() => {
-            console.log('complete');
             setShowButtons(true);
           }}
           onSound={onSound}

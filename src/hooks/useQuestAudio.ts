@@ -113,7 +113,6 @@ class AudioManager {
       );
 
       this.ready = true;
-      console.log('[Audio] All sounds preloaded');
     })();
 
     return this.loadingPromise;
@@ -139,8 +138,6 @@ class AudioManager {
     source.connect(gain);
     gain.connect(this.masterGain!);
     source.start(0);
-
-    console.log('[Audio] Unlocked');
   }
 
   play(name: SoundName) {
@@ -200,8 +197,7 @@ class AudioManager {
     try {
       source.start(0);
       this.lastPlayAt.set(name, now);
-    } catch (error) {
-      console.log(`[Audio] Play ${name} error:`, error);
+    } catch {
       this.active.get(name)?.delete(playback);
     }
   }

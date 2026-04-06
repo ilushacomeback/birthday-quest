@@ -60,8 +60,6 @@ export function AnswerStepCard({
     };
   }, [isHintOpen]);
 
-  console.log('handleNext', handleNext)
-
   return (
     <ScreenCard
       isError={isError}

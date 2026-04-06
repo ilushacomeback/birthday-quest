@@ -108,7 +108,6 @@ export function QuestPage() {
   };
 
   const handleDefaultButtonClick = async (button: TQuestButton) => {
-    console.log('change step', button);
 
     handleError(false);
 
@@ -133,7 +132,6 @@ export function QuestPage() {
     'noBackBtn' in currentStep && currentStep.noBackBtn
       ? undefined
       : (prevStepId?: QuestStepId) => {
-        console.log('prevStepId', prevStepId)
           if (prevStepId) {
             onStepChanged(prevStepId);
             return;
@@ -188,8 +186,6 @@ export function QuestPage() {
   };
 
   if (!init || !ready) return <Loader />;
-
-  console.log('currentstate', currentStep);
 
   return (
     <main className="safe-screen mx-auto flex w-full max-w-xl items-center px-4">
