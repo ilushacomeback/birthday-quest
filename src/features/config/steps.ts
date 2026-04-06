@@ -210,7 +210,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
     ],
     buttons: [
       {
-        label: 'Заправиться',
+        label: 'Заправиться и завести',
         nextStepId: 'engine-start',
         sound: 'engine',
         variant: 'default',
@@ -312,7 +312,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
       {
         type: 'image',
         src: call,
-        description: 'Не геи *Алина прости что ты обрезалась :(',
+        description: 'Не геи',
       },
       {
         type: 'image',
@@ -332,7 +332,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
       {
         type: 'image',
         src: sextop,
-        description: 'Илья попал в эскорт к Диме',
+        description: 'Попал в эскорт к Диме',
       },
       {
         type: 'image',
@@ -352,7 +352,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
       {
         type: 'image',
         src: sleep1,
-        description: 'Спим у Ильи',
+        description: 'Спим',
       },
       {
         type: 'image',
@@ -382,7 +382,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
       {
         type: 'image',
         src: train,
-        description: 'Дима спиздил Илью в Курск',
+        description: 'Дима спиздил в Курск',
       },
       {
         type: 'image',
@@ -448,9 +448,11 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
     id: 'secret',
     type: 'secret',
     lines: [
-      'Секретный раздел открыт.',
-      'Если ты это читаешь — значит дошёл куда надо.',
-      'Тут может быть ваша внутренняя шутка, скрытое фото, видео или особое сообщение.',
+      'Привет, братишка.',
+      'Вот тебе и исполнилось 25 годиков.',
+      'Крч желаю, чтобы у тебя все было путем, без лишних хлопот и с максимальной легкостью.',
+      'Мы с тобой знакомы уже очень давно и ты правда очень крутой чувак, никогда не забывай об этом!',
+      'Крч желаю, чтобы у тебя все было путем, без лишних хлопот и с максимальной легкостью.',
     ],
   },
 
