@@ -1,4 +1,3 @@
-
 import type { TCarouselSlide } from './CarouselViewport';
 import { VideoSlide } from './VideoSlide';
 
@@ -39,7 +38,6 @@ export const CarouselSlide = ({
             src={slide.src}
             poster={slide.poster}
             isActive={isActive}
-            onOpenFullscreen={onOpenFullscreen}
           />
         )}
       </div>
