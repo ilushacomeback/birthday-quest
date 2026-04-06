@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { MdFullscreen } from 'react-icons/md';
 import { ImSpinner2 } from 'react-icons/im';
 import clsx from 'clsx';
+import { FaPlay } from 'react-icons/fa';
+import { FaPause } from 'react-icons/fa';
 
 type HTMLVideoElementWithWebkit = HTMLVideoElement & {
   webkitEnterFullscreen?: () => void;
@@ -31,9 +33,15 @@ export const VideoSlide = ({
   const isLoading = isActive && shouldAttachSrc && !isReady;
   const canInteract = isActive && shouldAttachSrc && isReady;
 
+  const hideBtnRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const toggleShowBtn = (isShow: boolean) => {
+    if (hideBtnRef.current) {
+      window.clearTimeout(hideBtnRef.current);
+    }
+    
     if (!isShow) {
-      window.setTimeout(() => setIsShowBtn(false), 1000);
+      hideBtnRef.current = window.setTimeout(() => setIsShowBtn(false), 1000);
       return;
     }
 
@@ -47,12 +55,12 @@ export const VideoSlide = ({
     try {
       if (video.paused) {
         await video.play();
-        toggleShowBtn(false)
+        toggleShowBtn(false);
         return;
       }
 
       video.pause();
-      toggleShowBtn(true)
+      toggleShowBtn(true);
     } catch (error) {
       console.error(error);
     }
@@ -120,7 +128,7 @@ export const VideoSlide = ({
           setIsReady(false);
         }}
         onPlay={() => {
-          toggleShowBtn(false)
+          toggleShowBtn(false);
         }}
         onPlaying={() => {
           setHasBeenLoaded(true);
@@ -129,7 +137,7 @@ export const VideoSlide = ({
         }}
         onPause={() => {
           setIsPlaying(false);
-          toggleShowBtn(true)
+          toggleShowBtn(true);
         }}
         onEnded={(event) => {
           event.currentTarget.currentTime = 0;
@@ -155,8 +163,14 @@ export const VideoSlide = ({
             className="absolute inset-0 z-10 flex items-center justify-center"
           >
             {isShowBtn && (
-              <div className="rounded-full bg-black/50 px-4 py-3 text-xl text-white backdrop-blur-sm">
-                {isPlaying ? '❚❚' : '▶'}
+              <div className="rounded-full bg-black/50 px-4 py-4 text-xl text-white backdrop-blur-sm">
+                {isPlaying ? (
+                  <FaPause size={24} />
+                ) : (
+                  <div className="relative left-0.5">
+                    <FaPlay size={24} />
+                  </div>
+                )}
               </div>
             )}
           </button>
