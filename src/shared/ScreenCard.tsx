@@ -1,9 +1,9 @@
 import type { PropsWithChildren } from 'react';
 import clsx from 'clsx';
 import { motion } from 'motion/react';
-import { BackButton } from '../features/ui/BackButton';
+import { BackButton } from '../features/ui/buttons/BackButton';
 import type { QuestStepId } from '../features/config/types';
-import { NextButton } from '../features/ui/NextButton';
+import { NextButton } from '../features/ui/buttons/NextButton';
 
 type ScreenCardProps = PropsWithChildren<{
   className?: string;

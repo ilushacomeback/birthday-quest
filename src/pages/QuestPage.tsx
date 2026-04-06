@@ -3,7 +3,6 @@ import { useUnit } from 'effector-react';
 import { StepTransition } from '../shared/StepTransition';
 import { DefaultStepCard } from '../features/ui/DefaultStepCard';
 import { AnswerStepCard } from '../features/ui/AnswerStepCard';
-import { CarouselStepCard } from '../features/ui/CarouselStepCard';
 import { StartScreen } from '../features/ui/StartScreen';
 import { CompletedScreen } from '../features/ui/CompletedScreen';
 import { ScreenCard } from '../shared/ScreenCard';
@@ -26,6 +25,7 @@ import {
   togglePathToPhotosFromStartPage,
 } from '../model/quest';
 import { useQuestAudio } from '../hooks/useQuestAudio'; // импортируем хук
+import { CarouselStepCard } from '../features/ui/carousel/CarouselStepCard';
 
 export function QuestPage() {
   const [isAnswerError, setIsAnswerError] = useState(false);
@@ -246,7 +246,7 @@ export function QuestPage() {
 
             {currentStep.type === 'carousel' && (
               <CarouselStepCard
-                images={currentStep.images}
+                slides={currentStep.slides}
                 buttons={currentStep.buttons}
                 onButtonClick={handleDefaultButtonClick}
                 handleBack={handleBack}

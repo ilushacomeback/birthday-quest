@@ -1,4 +1,4 @@
-import { QuestButton } from '../../shared/QuestButton';
+import { QuestButton } from '../../../shared/QuestButton';
 import { IoMdArrowForward } from 'react-icons/io';
 
 type NextButtonProps = {

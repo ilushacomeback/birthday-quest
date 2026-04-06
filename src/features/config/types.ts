@@ -57,18 +57,26 @@ export type AnswerStep = BaseStep & {
   errorSound?: string;
 };
 
-type Image = {
-  src: string;
-  description?: string;
-};
+type CarouselSlide =
+  | {
+      type: 'image';
+      src: string;
+      description?: string;
+    }
+  | {
+      type: 'video';
+      src: string;
+      description?: string;
+      poster?: string;
+    };
 
 export type CarouselStep = {
   id: 'memories';
   type: 'carousel';
-  images: Image[];
+  slides: CarouselSlide[];
   buttons: TQuestButton[];
   prevStepId: QuestStepId;
-  nextStepId: QuestStepId,
+  nextStepId: QuestStepId;
 };
 
 export type CompletedStep = {

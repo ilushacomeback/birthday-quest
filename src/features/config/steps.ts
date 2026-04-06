@@ -17,6 +17,7 @@ import together from '../../assets/images/together.jpg';
 import toilet from '../../assets/images/toilet.jpg';
 import train from '../../assets/images/train.jpg';
 import zoya from '../../assets/images/zoya.jpg';
+import prevDr from '../../assets/videos/prevDr.mp4';
 import { INITIAL_STEP_ID } from './constants';
 
 export const questStepsMap: Record<QuestStepId, QuestStep> = {
@@ -231,76 +232,99 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
     type: 'carousel',
     prevStepId: 'engine-start',
     nextStepId: 'carpet-question',
-    images: [
+    slides: [
       {
+        type: 'video',
+        src: prevDr,
+        description: 'Указывает путь к "светлому прошлому"',
+      },
+      {
+        type: 'image',
         src: see,
         description: 'Указывает путь к "светлому прошлому"',
       },
       {
+        type: 'image',
         src: bear,
         description: 'Вот и то самое "светлое прошлое"',
       },
       {
+        type: 'image',
         src: call,
         description: 'Не геи *Алина прости что ты обрезалась :(',
       },
       {
+        type: 'image',
         src: fuck,
         description: 'По приколу вставил',
       },
       {
+        type: 'image',
         src: legenda,
         description: 'Тут Дима голый кст',
       },
       {
+        type: 'image',
         src: pasha,
         description: 'По девочкам ходили наверное',
       },
       {
+        type: 'image',
         src: sextop,
         description: 'Илья попал в эскорт к Диме',
       },
       {
+        type: 'image',
         src: sexy,
         description: 'Красуемся',
       },
       {
+        type: 'image',
         src: sexy2,
         description: 'Дима заигрывает',
       },
       {
+        type: 'image',
         src: sexy3,
         description: 'Стоим на панели у трёхи',
       },
       {
+        type: 'image',
         src: sleep1,
         description: 'Спим у Ильи',
       },
       {
+        type: 'image',
         src: sleep2,
         description: 'Дима в опасности',
       },
       {
+        type: 'image',
         src: sleep3,
         description: 'Любим поспать',
       },
       {
+        type: 'image',
         src: tg,
         description: 'Всем сердечко',
       },
       {
+        type: 'image',
         src: together,
         description: 'Их было четверо, четыре пацана',
       },
       {
+        type: 'image',
         src: toilet,
         description: 'Покакали',
       },
       {
+        type: 'image',
         src: train,
         description: 'Дима спиздил Илью в Курск',
       },
       {
+        type: 'image',
         src: zoya,
         description: 'Стоим с Зойкой',
       },
