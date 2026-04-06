@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { MdFullscreen } from 'react-icons/md';
+import { ImSpinner2 } from 'react-icons/im';
 
 type HTMLVideoElementWithWebkit = HTMLVideoElement & {
   webkitEnterFullscreen?: () => void;
@@ -13,7 +14,9 @@ type VideoSlideProps = {
 
 export const VideoSlide = ({ src, poster, isActive }: VideoSlideProps) => {
   const videoRef = useRef<HTMLVideoElementWithWebkit | null>(null);
+
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleTogglePlay = () => {
     const video = videoRef.current;
@@ -55,6 +58,7 @@ export const VideoSlide = ({ src, poster, isActive }: VideoSlideProps) => {
     video.currentTime = 0;
   }, [isActive]);
 
+  // 🎧 события видео
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -66,14 +70,21 @@ export const VideoSlide = ({ src, poster, isActive }: VideoSlideProps) => {
       setIsPlaying(false);
     };
 
+    const handleLoaded = () => setIsLoading(false);
+    const handleWaiting = () => setIsLoading(true);
+
     video.addEventListener('pause', handlePause);
     video.addEventListener('play', handlePlay);
     video.addEventListener('ended', handleEnded);
+    video.addEventListener('loadeddata', handleLoaded);
+    video.addEventListener('waiting', handleWaiting);
 
     return () => {
       video.removeEventListener('pause', handlePause);
       video.removeEventListener('play', handlePlay);
       video.removeEventListener('ended', handleEnded);
+      video.removeEventListener('loadeddata', handleLoaded);
+      video.removeEventListener('waiting', handleWaiting);
     };
   }, []);
 
@@ -88,24 +99,31 @@ export const VideoSlide = ({ src, poster, isActive }: VideoSlideProps) => {
         controls={false}
         className="h-full w-full object-contain"
       />
-
-      <button
-        type="button"
-        onClick={handleTogglePlay}
-        className="absolute inset-0 z-10 flex items-center justify-center"
-      >
-        <div className="rounded-full bg-black/50 px-4 py-3 text-xl text-white backdrop-blur-sm">
-          {isPlaying ? '❚❚' : '▶'}
+      {isLoading && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <ImSpinner2 className="animate-spin text-3xl text-white" />
         </div>
-      </button>
-
-      <button
-        type="button"
-        onClick={handleOpenNativeFullscreen}
-        className="absolute right-3 top-3 z-20 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs text-white/80 backdrop-blur"
-      >
-        <MdFullscreen size={24} />
-      </button>
+      )}
+      {!isLoading && (
+        <>
+          <button
+            type="button"
+            onClick={handleTogglePlay}
+            className="absolute inset-0 z-10 flex items-center justify-center"
+          >
+            <div className="rounded-full bg-black/50 px-4 py-3 text-xl text-white backdrop-blur-sm">
+              {isPlaying ? '❚❚' : '▶'}
+            </div>
+          </button>
+          <button
+            type="button"
+            onClick={handleOpenNativeFullscreen}
+            className="absolute right-3 top-3 z-30 rounded-xl border border-white/10 bg-black/40 p-2 text-white backdrop-blur"
+          >
+            <MdFullscreen size={24} />
+          </button>
+        </>
+      )}
     </div>
   );
 };
