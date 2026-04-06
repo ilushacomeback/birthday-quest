@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { MdFullscreen } from "react-icons/md";
+import { MdFullscreen } from 'react-icons/md';
 
 type VideoSlideProps = {
   src: string;
@@ -83,7 +83,15 @@ export const VideoSlide = ({
 
       <button
         type="button"
-        onClick={onOpenFullscreen}
+        onClick={() => {
+          const video = videoRef.current;
+          if (video) {
+            video.pause();
+            video.currentTime = 0;
+          }
+
+          onOpenFullscreen();
+        }}
         className="absolute right-3 top-3 z-20 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs text-white/80 backdrop-blur"
       >
         <MdFullscreen size={24} />

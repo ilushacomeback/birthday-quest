@@ -17,7 +17,18 @@ import together from '../../assets/images/together.jpg';
 import toilet from '../../assets/images/toilet.jpg';
 import train from '../../assets/images/train.jpg';
 import zoya from '../../assets/images/zoya.jpg';
-import prevDr from '../../assets/videos/prevDr.mp4';
+import bog from '../../assets/images/bog.jpg';
+import dacha from '../../assets/images/dacha.jpg';
+import msk from '../../assets/images/msk.jpg';
+import sexValera from '../../assets/images/sex.jpg';
+import vanna from '../../assets/images/vanna.jpg';
+import school from '../../assets/images/school.jpg';
+import drMsk from '../../assets/videos/drMsk.mp4';
+import vaz2114 from '../../assets/videos/2114.mp4';
+import film from '../../assets/videos/film.mp4';
+import valera from '../../assets/videos/valera.mp4';
+import vibe from '../../assets/videos/vibe.mp4';
+import videoDr from '../../assets/videos/videoDr.mp4';
 import { INITIAL_STEP_ID } from './constants';
 
 export const questStepsMap: Record<QuestStepId, QuestStep> = {
@@ -235,8 +246,58 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
     slides: [
       {
         type: 'video',
-        src: prevDr,
-        description: 'Указывает путь к "светлому прошлому"',
+        src: film,
+        description: 'Пришел с востока',
+      },
+      {
+        type: 'video',
+        src: videoDr,
+        description: 'Дима интерстеллар',
+      },
+      {
+        type: 'video',
+        src: drMsk,
+        description: 'Дршка в мск',
+      },
+      {
+        type: 'image',
+        src: vanna,
+        description: 'Купается',
+      },
+      {
+        type: 'image',
+        src: sexValera,
+        description: 'Изменяет с Валерой',
+      },
+      {
+        type: 'video',
+        src: valera,
+        description: 'Это рофл',
+      },
+      {
+        type: 'image',
+        src: school,
+        description: 'Стремится к знаниям',
+      },
+      {
+        type: 'video',
+        src: vaz2114,
+        description: 'Чуть-чуть сломалась',
+      },
+      {
+        type: 'image',
+        src: msk,
+        description: 'Чета улыбаемся',
+      },
+      {
+        type: 'image',
+        src: bog,
+        description: 'Очищаем грехи',
+      },
+      {
+        type: 'image',
+        src: dacha,
+        description: 'Оседлал Диму',
       },
       {
         type: 'image',
@@ -327,6 +388,11 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
         type: 'image',
         src: zoya,
         description: 'Стоим с Зойкой',
+      },
+      {
+        type: 'video',
+        src: vibe,
+        description: 'Валера с Геликом',
       },
     ],
     buttons: [
