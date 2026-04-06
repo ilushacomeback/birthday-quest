@@ -30,18 +30,23 @@ export const CarouselViewport = ({
   return (
     <div className="overflow-hidden rounded-3xl" ref={emblaRef}>
       <div className="flex">
-        {slides.map((slide, index) => (
-          <div
-            key={`${slide.type}-${slide.src}-${index}`}
-            className="min-w-0 shrink-0 grow-0 basis-full"
-          >
-            <CarouselSlide
-              slide={slide}
-              isActive={selectedIndex === index}
-              onOpenFullscreen={() => onOpenFullscreen(slide)}
-            />
-          </div>
-        ))}
+        {slides.map((slide, index) => {
+          const isNearActive = Math.abs(index - selectedIndex) <= 1;
+
+          return (
+            <div
+              key={`${slide.type}-${slide.src}-${index}`}
+              className="min-w-0 shrink-0 grow-0 basis-full"
+            >
+              <CarouselSlide
+                slide={slide}
+                isActive={selectedIndex === index}
+                shouldLoad={isNearActive}
+                onOpenFullscreen={() => onOpenFullscreen(slide)}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );

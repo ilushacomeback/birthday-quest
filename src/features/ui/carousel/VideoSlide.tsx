@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { MdFullscreen } from 'react-icons/md';
 import { ImSpinner2 } from 'react-icons/im';
+import clsx from 'clsx';
 
 type HTMLVideoElementWithWebkit = HTMLVideoElement & {
   webkitEnterFullscreen?: () => void;
@@ -10,29 +11,44 @@ type VideoSlideProps = {
   src: string;
   poster?: string;
   isActive: boolean;
+  shouldLoad: boolean;
 };
 
-export const VideoSlide = ({ src, poster, isActive }: VideoSlideProps) => {
+export const VideoSlide = ({
+  src,
+  poster,
+  isActive,
+  shouldLoad,
+}: VideoSlideProps) => {
   const videoRef = useRef<HTMLVideoElementWithWebkit | null>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isReady, setIsReady] = useState(false);
+  const [hasBeenLoaded, setHasBeenLoaded] = useState(shouldLoad);
 
-  const handleTogglePlay = () => {
+  const shouldAttachSrc = shouldLoad || hasBeenLoaded;
+  const isLoading = isActive && shouldAttachSrc && !isReady;
+  const canInteract = isActive && shouldAttachSrc && isReady;
+
+  const handleTogglePlay = async () => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || !canInteract) return;
 
-    if (video.paused) {
-      void video.play();
-      return;
+    try {
+      if (video.paused) {
+        await video.play();
+        return;
+      }
+
+      video.pause();
+    } catch (error) {
+      console.error(error);
     }
-
-    video.pause();
   };
 
   const handleOpenNativeFullscreen = async () => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || !canInteract) return;
 
     try {
       await video.play();
@@ -58,53 +74,64 @@ export const VideoSlide = ({ src, poster, isActive }: VideoSlideProps) => {
     video.currentTime = 0;
   }, [isActive]);
 
-  // 🎧 события видео
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const handlePause = () => setIsPlaying(false);
-    const handlePlay = () => setIsPlaying(true);
-    const handleEnded = () => {
-      video.currentTime = 0;
-      setIsPlaying(false);
-    };
-
-    const handleLoaded = () => setIsLoading(false);
-    const handleWaiting = () => setIsLoading(true);
-
-    video.addEventListener('pause', handlePause);
-    video.addEventListener('play', handlePlay);
-    video.addEventListener('ended', handleEnded);
-    video.addEventListener('loadeddata', handleLoaded);
-    video.addEventListener('waiting', handleWaiting);
-
-    return () => {
-      video.removeEventListener('pause', handlePause);
-      video.removeEventListener('play', handlePlay);
-      video.removeEventListener('ended', handleEnded);
-      video.removeEventListener('loadeddata', handleLoaded);
-      video.removeEventListener('waiting', handleWaiting);
-    };
-  }, []);
-
   return (
     <div className="relative h-105 w-full overflow-hidden bg-black/50">
       <video
         ref={videoRef}
-        src={src}
+        src={shouldAttachSrc ? src : undefined}
         poster={poster}
         playsInline
-        preload="metadata"
+        preload={isActive ? 'metadata' : 'none'}
         controls={false}
-        className="h-full w-full object-contain"
+        className={clsx(
+          'h-full w-full object-contain transition-opacity duration-200',
+          isLoading ? 'opacity-0' : 'opacity-100',
+        )}
+        onLoadStart={() => {
+          setHasBeenLoaded(true);
+          setIsReady(false);
+          setIsPlaying(false);
+        }}
+        onLoadedMetadata={() => {
+          setHasBeenLoaded(true);
+          setIsReady(true);
+        }}
+        onLoadedData={() => {
+          setHasBeenLoaded(true);
+          setIsReady(true);
+        }}
+        onCanPlay={() => {
+          setHasBeenLoaded(true);
+          setIsReady(true);
+        }}
+        onWaiting={() => {
+          setIsReady(false);
+        }}
+        onPlaying={() => {
+          setHasBeenLoaded(true);
+          setIsReady(true);
+          setIsPlaying(true);
+        }}
+        onPause={() => {
+          setIsPlaying(false);
+        }}
+        onEnded={(event) => {
+          event.currentTarget.currentTime = 0;
+          setIsPlaying(false);
+        }}
+        onError={() => {
+          setIsReady(false);
+          setIsPlaying(false);
+        }}
       />
+
       {isLoading && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/45 backdrop-blur-sm">
           <ImSpinner2 className="animate-spin text-3xl text-white" />
         </div>
       )}
-      {!isLoading && (
+
+      {canInteract && (
         <>
           <button
             type="button"
@@ -115,12 +142,13 @@ export const VideoSlide = ({ src, poster, isActive }: VideoSlideProps) => {
               {isPlaying ? '❚❚' : '▶'}
             </div>
           </button>
+
           <button
             type="button"
             onClick={handleOpenNativeFullscreen}
             className="absolute right-3 top-3 z-30 rounded-xl border border-white/10 bg-black/40 p-2 text-white backdrop-blur"
           >
-            <MdFullscreen size={24} />
+            <MdFullscreen size={22} />
           </button>
         </>
       )}

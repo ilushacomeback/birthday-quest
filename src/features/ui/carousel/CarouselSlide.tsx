@@ -1,43 +1,36 @@
-import type { TCarouselSlide } from './CarouselViewport';
+import { ImageSlide } from './ImageSlide';
 import { VideoSlide } from './VideoSlide';
+import type { TCarouselSlide } from './CarouselViewport';
 
 type CarouselSlideProps = {
   slide: TCarouselSlide;
   isActive: boolean;
+  shouldLoad: boolean;
   onOpenFullscreen: () => void;
 };
 
 export const CarouselSlide = ({
   slide,
   isActive,
+  shouldLoad,
   onOpenFullscreen,
 }: CarouselSlideProps) => {
   return (
     <div>
       <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5">
         {slide.type === 'image' ? (
-          <button
-            type="button"
-            onClick={onOpenFullscreen}
-            className="relative block h-105 w-full overflow-hidden bg-black/50"
-          >
-            <img
-              src={slide.src}
-              alt=""
-              className="absolute inset-0 h-full w-full scale-110 object-cover blur-2xl opacity-30"
-            />
-            <div className="absolute inset-0 bg-black/30" />
-            <img
-              src={slide.src}
-              alt={slide.description ?? 'memory-slide'}
-              className="relative z-10 h-full w-full object-contain"
-            />
-          </button>
+          <ImageSlide
+            src={slide.src}
+            description={slide.description}
+            shouldLoad={shouldLoad}
+            onOpenFullscreen={onOpenFullscreen}
+          />
         ) : (
           <VideoSlide
             src={slide.src}
             poster={slide.poster}
             isActive={isActive}
+            shouldLoad={shouldLoad}
           />
         )}
       </div>
