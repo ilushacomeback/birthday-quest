@@ -25,10 +25,20 @@ export const VideoSlide = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [hasBeenLoaded, setHasBeenLoaded] = useState(shouldLoad);
+  const [isShowBtn, setIsShowBtn] = useState(true);
 
   const shouldAttachSrc = shouldLoad || hasBeenLoaded;
   const isLoading = isActive && shouldAttachSrc && !isReady;
   const canInteract = isActive && shouldAttachSrc && isReady;
+
+  const toggleShowBtn = (isShow: boolean) => {
+    if (!isShow) {
+      window.setTimeout(() => setIsShowBtn(false), 1000);
+      return;
+    }
+
+    setIsShowBtn(true);
+  };
 
   const handleTogglePlay = async () => {
     const video = videoRef.current;
@@ -37,10 +47,12 @@ export const VideoSlide = ({
     try {
       if (video.paused) {
         await video.play();
+        toggleShowBtn(false)
         return;
       }
 
       video.pause();
+      toggleShowBtn(true)
     } catch (error) {
       console.error(error);
     }
@@ -107,6 +119,9 @@ export const VideoSlide = ({
         onWaiting={() => {
           setIsReady(false);
         }}
+        onPlay={() => {
+          toggleShowBtn(false)
+        }}
         onPlaying={() => {
           setHasBeenLoaded(true);
           setIsReady(true);
@@ -114,6 +129,7 @@ export const VideoSlide = ({
         }}
         onPause={() => {
           setIsPlaying(false);
+          toggleShowBtn(true)
         }}
         onEnded={(event) => {
           event.currentTarget.currentTime = 0;
@@ -138,9 +154,11 @@ export const VideoSlide = ({
             onClick={handleTogglePlay}
             className="absolute inset-0 z-10 flex items-center justify-center"
           >
-            <div className="rounded-full bg-black/50 px-4 py-3 text-xl text-white backdrop-blur-sm">
-              {isPlaying ? '❚❚' : '▶'}
-            </div>
+            {isShowBtn && (
+              <div className="rounded-full bg-black/50 px-4 py-3 text-xl text-white backdrop-blur-sm">
+                {isPlaying ? '❚❚' : '▶'}
+              </div>
+            )}
           </button>
 
           <button
