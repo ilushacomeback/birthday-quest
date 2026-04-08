@@ -351,6 +351,11 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
       },
       {
         type: 'image',
+        src: zoya,
+        description: 'Стоим с Зойкой',
+      },
+      {
+        type: 'image',
         src: sleep1,
         description: 'Спим',
       },
@@ -385,14 +390,9 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
         description: 'Дима спиздил в Курск',
       },
       {
-        type: 'image',
-        src: zoya,
-        description: 'Стоим с Зойкой',
-      },
-      {
         type: 'video',
         src: vibe,
-        description: 'Валера с Геликом',
+        description: 'Ах какая пара...',
       },
     ],
     buttons: [
@@ -453,7 +453,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
       'Крч желаю, чтобы у тебя все было путем, без лишних хлопот и с максимальной легкостью.',
       'Мы с тобой знакомы уже очень давно и ты правда очень крутой чувак, никогда не забывай об этом!',
       'Если вдруг захочешь повспоминать прошлое, то всегда можешь зайти на этот сайтик)',
-      'Давай, родной, всех благ!'
+      'Давай, родной, всех благ!',
     ],
   },
 
