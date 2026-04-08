@@ -257,7 +257,7 @@ export const questStepsMap: Record<QuestStepId, QuestStep> = {
       {
         type: 'video',
         src: drMsk,
-        description: 'Дршка в мск',
+        description: 'Адыхаем',
       },
       {
         type: 'image',
